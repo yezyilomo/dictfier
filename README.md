@@ -8,7 +8,7 @@
 
 ### Installing
 
-```
+```python
 pip3 install dictifier
 ```
 
@@ -16,7 +16,7 @@ pip3 install dictifier
 
 -**Converting flat object into dict**
 
-```
+```python
 import dictifier
 
 class Student(object):
@@ -37,7 +37,7 @@ print(std_info)
 
 -**Converting nested object into dict**
 
-```
+```python
 import dictifier
 
 class Course(object):
@@ -71,7 +71,7 @@ print(std_info)
 
 -**Converting objects nested with iterable objects into dict**
 
-```
+```python
 import dictifier
 
 class Course(object):
@@ -124,7 +124,7 @@ A Query is defined as a list of Object's fields to be extracted.
 **Eg**.
 
 When student object is queried using query below
-```
+```python
 query = [
     "name",
     "age"
@@ -133,7 +133,7 @@ query = [
 
 **dictifier** will convert it into 
 
-```
+```python
 {
     "name": student.name,
     "age": student.age,
@@ -143,7 +143,7 @@ query = [
 
 **For nested queries it goes like**
 
-```
+```python
 query = [
     "name",
     "age",
@@ -158,7 +158,7 @@ query = [
 
 **Corresponding dict**
 
-```
+```python
 {
     "name": student.name,
     "age": student.age,

@@ -159,9 +159,9 @@ print(std_info)
 
 ## How dictifier works
 
-**dictifier** works by converting query given into a corresponding dict. So what's important here is to know how to structure right queries to extract right data from your object.
+**dictifier** works by converting Object given into a corresponding dict by using a **Query**. So what's important here is to know how to structure right queries to extract right data from your object.
 
-**What's a query anyway?**
+**What's a Query anyway?**
 
 A Query is basically a template which tells dictifier what to extract from an object. It is defined as a list or tuple of Object's fields to be extracted.
 

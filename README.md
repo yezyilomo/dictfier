@@ -14,7 +14,7 @@ pip3 install dictifier
 
 ## Getting Started
 
--**Converting flat object into dict**
+**Converting flat object into dict**
 
 ```python
 import dictifier
@@ -35,7 +35,7 @@ std_info = dictifier.dictify(student, query)
 print(std_info)
 ```
 
--**Converting nested object into dict**
+**Converting nested object into dict**
 
 ```python
 import dictifier
@@ -69,7 +69,7 @@ std_info = dictifier.dictify(student, query)
 print(std_info)
 ```
 
--**Converting objects nested with iterable objects into dict**
+**Converting objects nested with iterable objects into dict**
 
 ```python
 import dictifier
@@ -107,27 +107,71 @@ std_info = dictifier.dictify(student, query)
 print(std_info)
 ```
 
--**Important Tip**
+**What about instance methods or callable object fields?**
 
-What's important here is to know how to structure right queries to extract right data from your object.
+Well we've got good news for you, **dictifier** can use callables which return values as fields, It's very simple, you just have to use "call_callable=True" as a keyword argument to dictify function and put your callable field to a query. Eg
 
--**What's a query anyway?**
+```python
+import dictifier
 
-A Query is basically a template which tells dictifier what to extract from an object.
+class Student(object):
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
 
-A Query is defined as a list of Object's fields to be extracted.
+    def age_in_days(self):
+        return self.age * 365
 
--**How dictifier works**
+student = Student("Danish", 24)
 
-**dictifier** works by converting query given into a corresponding dict
+query = [
+    "name",
+    "age_in_days"
+]
 
-**Eg**.
+std_info = dictifier.dictify(student, query, call_callable=True)
+print(std_info)
+```
 
-When student object is queried using query below
+**You can also add your custom field by using "not_found_create" keyword argument. Eg
+
+```python
+import dictifier
+
+class Student(object):
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+student = Student("Danish", 24)
+
+query = [
+    "name",
+    "age",
+    {
+        "school": "St Patrick"
+    }
+]
+
+std_info = dictifier.dictify(student, query, not_found_create=True)
+print(std_info)
+```
+
+## How dictifier works
+
+**dictifier** works by converting query given into a corresponding dict. So what's important here is to know how to structure right queries to extract right data from your object.
+
+**What's a query anyway?**
+
+A Query is basically a template which tells dictifier what to extract from an object. It is defined as a list or tuple of Object's fields to be extracted.
+
+**Sample conversions**.
+
+When student object is queried using a query below
 ```python
 query = [
     "name",
-    "age"
+    "age",
 ]
 ```
 
@@ -139,7 +183,6 @@ query = [
     "age": student.age,
 }   
 ```
-
 
 **For nested queries it goes like**
 
@@ -168,5 +211,48 @@ query = [
     }
 }
 ```
+
+**For iterable objects it goes like**
+
+```python
+query = [
+    "name",
+    "age",
+    {
+        "course": [ 
+            [
+                "code",
+                "name",
+            ]
+        ]
+    }
+]
+```
+Putting a list or tuple inside a list or tuple of object fields is a way to declare that the Object is iterable in this case
+```python
+[ 
+    [
+        "code",
+        "name",
+    ]
+]
+```
+
+**Corresponding dict**
+
+```python
+{
+    "name": student.name,
+    "age": student.age,
+    "courses": [
+        {
+            "code": course.code,
+            "name": course.name,
+        } 
+        for course in student.courses
+    ]
+}
+```
+Notice the list or tuple on "courses" unlike in other fields like "name" and "age", it makes "courses" iterable, This is the reason for having nested list or tuple on "courses" query.
 
 **It's pretty simple right?**

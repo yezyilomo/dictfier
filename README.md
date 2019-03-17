@@ -14,7 +14,7 @@ pip3 install dictifier
 
 ## Getting Started
 
-**Converting flat object into dict**
+**Converting a flat object into dict**
 
 ```python
 import dictifier
@@ -69,7 +69,7 @@ std_info = dictifier.dictify(student, query)
 print(std_info)
 ```
 
-**Converting objects nested with iterable objects into dict**
+**Converting object nested with iterable object into dict**
 
 ```python
 import dictifier
@@ -109,7 +109,7 @@ print(std_info)
 
 **What about instance methods or callable object fields?**
 
-Well we've got good news for you, **dictifier** can use callables which return values as fields, It's very simple, you just have to use "call_callable=True" as a keyword argument to dictify function and put your callable field to a query. Eg
+Well we've got good news for that, **dictifier** can use callables which return values as fields, It's very simple, you just have to use "call_callable=True" as a keyword argument to dictify function and add your callable field to a query. Eg
 
 ```python
 import dictifier
@@ -167,7 +167,7 @@ A Query is basically a template which tells dictifier what to extract from an ob
 
 **Sample conversions**.
 
-When student object is queried using a query below
+When a flat student object is queried using a query below
 ```python
 query = [
     "name",

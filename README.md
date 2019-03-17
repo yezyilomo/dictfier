@@ -14,7 +14,7 @@ pip3 install dictifier
 
 ## Getting Started
 
-**Converting a flat object into dict**
+**Converting a flat object into a dict**
 
 ```python
 import dictifier
@@ -35,7 +35,7 @@ std_info = dictifier.dictify(student, query)
 print(std_info)
 ```
 
-**Converting nested object into dict**
+**Converting nested object into a dict**
 
 ```python
 import dictifier
@@ -69,7 +69,7 @@ std_info = dictifier.dictify(student, query)
 print(std_info)
 ```
 
-**Converting object nested with iterable object into dict**
+**Converting object nested with iterable object into a dict**
 
 ```python
 import dictifier

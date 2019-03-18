@@ -1,27 +1,19 @@
 from .exceptions import FormatError
 
 
-def node_validity(against):
-
-    def wraper(node):
-        node_is_valid = isinstance(node, against)
-        if node_is_valid:
-            return True
-        else:
-            message = f"Invalid Query format on \"{node}\" node."
-            raise FormatError(message)
-
-    return wraper
-
-
-def query_validity(obj, query):
+def valid_query(obj, query):
     flat_or_nested = all(
-        map(node_validity((str, dict)), query)
+        map(
+            lambda node : isinstance(node, (str, dict)),
+            query
+        )
     )
 
-    iterable = (len(query) <= 1) and \
-        all(
-        map(node_validity((list, tuple)), query)
+    iterable = (len(query) <= 1) and all(
+        map(
+            lambda node: isinstance(node, (list, tuple)),
+            query
+        )
     )
 
     if flat_or_nested or iterable:
@@ -31,8 +23,11 @@ def query_validity(obj, query):
 
 
 def _dict(obj, query, call_callable, not_found_create, fields=None):
-    # Check if the query is valid against object
-    assert query_validity(obj, query)
+    # Check if the query node is valid against object
+    if not valid_query(obj, query):
+        message = "Invalid Query format on \"%s\" node." % (query)
+        raise FormatError(message)
+
     for field in query:
         if isinstance(field, str):
             # Flat field
@@ -98,10 +93,10 @@ def _dict(obj, query, call_callable, not_found_create, fields=None):
                     fields=sub_field
                 )
         else:
-            message = f"""
-                Wrong formating of Query on '{field}' node, It seems like the Query was mutated on run time.
+            message = """
+                Wrong formating of Query on '%s' node, It seems like the Query was mutated on run time.
                 Use 'tuple' instead of 'list' to avoid mutating Query accidentally.
-                """
+                """ % (field)
             raise FormatError(message)
 
     return fields

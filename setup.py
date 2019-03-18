@@ -11,18 +11,31 @@ DESCRIPTION = """
 REQUIRES_PYTHON = '>=2.7'
 here = os.path.abspath(os.path.dirname(__file__))
 
-# Import the README and use it as the long-description.
+
+# =============================================================================
+# Convert README.md to README.rst for pypi
+# Need to install both pypandoc and pandoc 
+# - pip insall pypandoc
+# - https://pandoc.org/installing.html
+# =============================================================================
 try:
-    with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
-        long_description = '\n' + f.read()
-except FileNotFoundError:
-    long_description = DESCRIPTION
+    from pypandoc import convert
+
+    def read_md(f):
+        return convert(f, 'rst')
+except:
+    print('Warning: pypandoc module not found, unable to convert README.md to RST')
+    print('Unless you are packaging this module for distribution you can ignore this error')
+
+    def read_md(f):
+        return DESCRIPTION
+
 
 setup(
     name = 'dictifier',
     version = '0.0.0',
     description = DESCRIPTION,
-    long_description=long_description,
+    long_description=read_md('README.md'),
     long_description_content_type='text/markdown',
     url="https://github.com/yezyilomo/dictifier",
     author = 'Yezy Ilomo',

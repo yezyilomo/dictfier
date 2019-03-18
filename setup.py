@@ -33,7 +33,7 @@ except:
 
 setup(
     name = 'dictifier',
-    version = '0.0.0',
+    version = '0.0.1',
     description = DESCRIPTION,
     long_description=read_md('README.md'),
     long_description_content_type='text/markdown',

@@ -4,12 +4,17 @@
 
 ### Prerequisites
 
--python3
+-python version >= 2.7
 
 ### Installing
-
+For python3
 ```python
 pip3 install dictifier
+```
+
+For python2
+```python
+pip install dictifier
 ```
 
 ## Getting Started

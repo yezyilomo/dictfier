@@ -8,7 +8,7 @@ DESCRIPTION = """
     It's very useful in converting Python Objects into JSON format especially for nested objects, 
     because they can't be handled well by json library
     """
-REQUIRES_PYTHON = '>=3'
+REQUIRES_PYTHON = '>=3.0'
 here = os.path.abspath(os.path.dirname(__file__))
 
 # Import the README and use it as the long-description.

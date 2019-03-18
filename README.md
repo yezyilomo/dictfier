@@ -109,7 +109,7 @@ print(std_info)
 
 **What about instance methods or callable object fields?**
 
-Well we've got good news for that, **dictifier** can use callables which return values as fields, It's very simple, you just have to use "call_callable=True" as a keyword argument to dictify function and add your callable field to a query. Eg
+Well we've got good news for that, **dictifier** can use callables which return values as fields, It's very simple, you just have to pass "call_callable=True" as a keyword argument to dictify function and add your callable field to a query. Eg
 
 ```python
 import dictifier
@@ -133,7 +133,7 @@ std_info = dictifier.dictify(student, query, call_callable=True)
 print(std_info)
 ```
 
-**You can also add your custom field by using "not_found_create" keyword argument. Eg
+**You can also add your custom field by using "not_found_create" keyword argument. Eg**
 
 ```python
 import dictifier
@@ -157,9 +157,9 @@ std_info = dictifier.dictify(student, query, not_found_create=True)
 print(std_info)
 ```
 
-## How dictifier works
+## How dictifier works?
 
-**dictifier** works by converting Object given into a corresponding dict by using a **Query**. So what's important here is to know how to structure right queries to extract right data from your object.
+**dictifier** works by converting given Object into a corresponding dict **recursively(Hence works on nested objects)** by using a **Query**. So what's important here is to know how to structure right queries to extract right data from the object.
 
 **What's a Query anyway?**
 
@@ -248,7 +248,7 @@ Putting a list or tuple inside a list or tuple of object fields is a way to decl
         {
             "code": course.code,
             "name": course.name,
-        } 
+        }
         for course in student.courses
     ]
 }

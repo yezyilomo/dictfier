@@ -1,5 +1,8 @@
 from .exceptions import FormatError
 
+class UseObj(object):
+    def __init__(self, function):
+        self.function = function
 
 def valid_query(obj, query):
     flat_or_nested = all(
@@ -25,7 +28,7 @@ def valid_query(obj, query):
 def _dict(obj, query, call_callable, not_found_create, fields=None):
     # Check if the query node is valid against object
     if not valid_query(obj, query):
-        message = "Invalid Query format on \"%s\" node." % (query)
+        message = "Invalid Query format on \"%s\" node." % str(query)
         raise FormatError(message)
 
     for field in query:
@@ -45,7 +48,10 @@ def _dict(obj, query, call_callable, not_found_create, fields=None):
 
                 if not_found_create and not found:
                     # Create new field
-                    fields.update({sub_field: field[sub_field]})
+                    if isinstance(field[sub_field], UseObj):
+                        fields.update({sub_field: field[sub_field].function(obj)})
+                    else:
+                        fields.update({sub_field: field[sub_field]})
                     continue
                 elif not found:
                     # Throw NotFound Error [FIXME]
@@ -96,7 +102,7 @@ def _dict(obj, query, call_callable, not_found_create, fields=None):
             message = """
                 Wrong formating of Query on '%s' node, It seems like the Query was mutated on run time.
                 Use 'tuple' instead of 'list' to avoid mutating Query accidentally.
-                """ % (field)
+                """ % str(field)
             raise FormatError(message)
 
     return fields

@@ -7,3 +7,6 @@ def dictify(obj, query, call_callable=False, not_found_create=False):
         call_callable, 
         not_found_create
     )
+
+def useobj(function):
+    return factory.UseObj(function)

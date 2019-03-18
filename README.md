@@ -138,7 +138,7 @@ std_info = dictifier.dictify(student, query, call_callable=True)
 print(std_info)
 ```
 
-**You can also add your custom field by using "not_found_create" keyword argument. Eg**
+**You can also add your custom field by using "not_found_create=True" as a keyword argument. Eg**
 
 ```python
 import dictifier
@@ -159,6 +159,38 @@ query = [
 ]
 
 std_info = dictifier.dictify(student, query, not_found_create=True)
+print(std_info)
+```
+
+**What if we want to use object field on a custom field to do some computations?.**
+
+Well there is a way to do that too, **dictifier** API provides **useobj** hook which is used to hook/pull the object on a current query node. To use the current object, just define a fuction which accept one argument(which is an object) and do your computations on that function then return the result, call **useobj** and pass that defined fuction to it. 
+
+Let's say we want to calculate age of a student in terms of months from a student object with age field in terms of years. Here is how we would do this by using **useobj** hook.
+
+```python
+import dictifier
+
+class Student(object):
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+student = Student("Danish", 24)
+
+def age_in_months(obj):
+    # Do the computation here then return the result
+    return obj.age * 12
+
+query = [
+    "name",
+    
+    # This is a custom field which is computed by using age field from a student object
+    # Note how age_in_months function is passed to useobj hook(This is very important for API to work)
+    {"age_in_months": dictifier.useobj(age_in_months)}
+]
+
+std_info = dictifier.dictify(student, query)
 print(std_info)
 ```
 

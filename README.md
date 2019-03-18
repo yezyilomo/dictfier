@@ -265,7 +265,7 @@ query = [
     }
 ]
 ```
-Putting a list or tuple inside a list or tuple of object fields is a way to declare that the Object is iterable in this case
+Putting a list or tuple inside a list or tuple of object fields is a way to declare that the Object is iterable. In this case
 ```python
 [ 
     [

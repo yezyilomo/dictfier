@@ -1,4 +1,3 @@
-import functools
 from .exceptions import FormatError
 
 

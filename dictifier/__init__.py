@@ -1,1 +1,1 @@
-from .api import dictify
+from .api import dictify, useobj

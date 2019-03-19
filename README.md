@@ -1,6 +1,6 @@
-# dictifier
+# dictfier
 
-**dictifier** is a library to convert Python class instances(Objects) both **flat** and **nested** into a dictionary data structure. It's very useful in converting Python Objects into JSON format especially for nested objects, because they can't be handled well by json library
+**dictfier** is a library to convert Python class instances(Objects) both **flat** and **nested** into a dictionary data structure. It's very useful in converting Python Objects into JSON format especially for nested objects, because they can't be handled well by json library
 
 ### Prerequisites
 
@@ -9,12 +9,12 @@
 ### Installing
 For python3
 ```python
-pip3 install dictifier
+pip3 install dictfier
 ```
 
 For python2
 ```python
-pip install dictifier
+pip install dictfier
 ```
 
 ## Getting Started
@@ -22,7 +22,7 @@ pip install dictifier
 **Converting a flat object into a dict**
 
 ```python
-import dictifier
+import dictfier
 
 class Student(object):
     def __init__(self, name, age):
@@ -36,14 +36,14 @@ query = [
     "age"
 ]
 
-std_info = dictifier.dictify(student, query)
+std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
 **Converting nested object into a dict**
 
 ```python
-import dictifier
+import dictfier
 
 class Course(object):
     def __init__(self, code, name):
@@ -70,14 +70,14 @@ query = [
     }
 ]
 
-std_info = dictifier.dictify(student, query)
+std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
 **Converting object nested with iterable object into a dict**
 
 ```python
-import dictifier
+import dictfier
 
 class Course(object):
     def __init__(self, code, name):
@@ -108,16 +108,16 @@ query = [
     }
 ]
 
-std_info = dictifier.dictify(student, query)
+std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
 **What about instance methods or callable object fields?**
 
-Well we've got good news for that, **dictifier** can use callables which return values as fields, It's very simple, you just have to pass "call_callable=True" as a keyword argument to dictify function and add your callable field to a query. Eg
+Well we've got good news for that, **dictfier** can use callables which return values as fields, It's very simple, you just have to pass "call_callable=True" as a keyword argument to dictfy function and add your callable field to a query. Eg
 
 ```python
-import dictifier
+import dictfier
 
 class Student(object):
     def __init__(self, name, age):
@@ -134,14 +134,14 @@ query = [
     "age_in_days"
 ]
 
-std_info = dictifier.dictify(student, query, call_callable=True)
+std_info = dictfier.dictfy(student, query, call_callable=True)
 print(std_info)
 ```
 
 **You can also add your custom field by using "not_found_create=True" as a keyword argument. Eg**
 
 ```python
-import dictifier
+import dictfier
 
 class Student(object):
     def __init__(self, name, age):
@@ -158,18 +158,18 @@ query = [
     }
 ]
 
-std_info = dictifier.dictify(student, query, not_found_create=True)
+std_info = dictfier.dictfy(student, query, not_found_create=True)
 print(std_info)
 ```
 
 **What if we want to use object field on a custom field to do some computations?.**
 
-Well there is a way to do that too, **dictifier** API provides **useobj** hook which is used to hook/pull the object on a current query node. To use the current object, just define a fuction which accept one argument(which is an object) and do your computations on that function then return the result, call **useobj** and pass that defined fuction to it. 
+Well there is a way to do that too, **dictfier** API provides **useobj** hook which is used to hook/pull the object on a current query node. To use the current object, just define a fuction which accept one argument(which is an object) and do your computations on that function then return the result, call **useobj** and pass that defined fuction to it. 
 
 Let's say we want to calculate age of a student in terms of months from a student object with age field in terms of years. Here is how we would do this by using **useobj** hook.
 
 ```python
-import dictifier
+import dictfier
 
 class Student(object):
     def __init__(self, name, age):
@@ -187,20 +187,20 @@ query = [
     
     # This is a custom field which is computed by using age field from a student object
     # Note how age_in_months function is passed to useobj hook(This is very important for API to work)
-    {"age_in_months": dictifier.useobj(age_in_months)}
+    {"age_in_months": dictfier.useobj(age_in_months)}
 ]
 
-std_info = dictifier.dictify(student, query)
+std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
-## How dictifier works?
+## How dictfier works?
 
-**dictifier** works by converting given Object into a corresponding dict **recursively(Hence works on nested objects)** by using a **Query**. So what's important here is to know how to structure right queries to extract right data from the object.
+**dictfier** works by converting given Object into a corresponding dict **recursively(Hence works on nested objects)** by using a **Query**. So what's important here is to know how to structure right queries to extract right data from the object.
 
 **What's a Query anyway?**
 
-A Query is basically a template which tells dictifier what to extract from an object. It is defined as a list or tuple of Object's fields to be extracted.
+A Query is basically a template which tells dictfier what to extract from an object. It is defined as a list or tuple of Object's fields to be extracted.
 
 **Sample conversions**.
 
@@ -212,7 +212,7 @@ query = [
 ]
 ```
 
-**dictifier** will convert it into 
+**dictfier** will convert it into 
 
 ```python
 {

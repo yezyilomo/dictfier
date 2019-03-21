@@ -37,7 +37,9 @@ if sys.argv[-1] == 'build':
     sys.exit()
 
 if sys.argv[-1] == 'publish':
-    os.system('twine upload dist/*')
+    test_failed = os.system('pipenv run python -m unittest discover -v')
+    if not test_failed:
+        os.system('python setup.py sdist bdist_wheel upload')
     sys.exit()
 
 setup(
@@ -46,7 +48,7 @@ setup(
     description = DESCRIPTION,
     long_description=read_md('README.md'),
     long_description_content_type='text/markdown',
-    url="https://github.com/yezyilomo/dictifier",
+    url="https://github.com/yezyilomo/dictfier",
     author = 'Yezy Ilomo',
     author_email = 'yezileliilomo@hotmail.com',
     packages = find_packages(exclude=('tests','test')),

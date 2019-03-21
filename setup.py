@@ -30,21 +30,9 @@ except:
     def read_md(f):
         return DESCRIPTION
 
-if sys.argv[-1] == 'build':
-    test_failed = os.system('pipenv run python -m unittest discover -v')
-    if not test_failed:
-        os.system('python setup.py sdist bdist_wheel')
-    sys.exit()
-
-if sys.argv[-1] == 'publish':
-    test_failed = os.system('pipenv run python -m unittest discover -v')
-    if not test_failed:
-        os.system('python setup.py sdist bdist_wheel upload')
-    sys.exit()
-
 setup(
     name = 'dictfier',
-    version = '1.0.6',
+    version = '1.0.7',
     description = DESCRIPTION,
     long_description=read_md('README.md'),
     long_description_content_type='text/markdown',

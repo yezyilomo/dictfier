@@ -1,10 +1,10 @@
 # dictfier
 
-**dictfier** is a library to convert Python class instances(Objects) both **flat** and **nested** into a dictionary data structure. It's very useful in converting Python Objects into JSON format especially for nested objects, because they can't be handled well by json library
+**dictfier** is a library to convert/serialize Python class instances(Objects) both **flat** and **nested** into a dictionary data structure. It's very useful in converting Python Objects into JSON format especially for nested objects, because they can't be handled well by json library
 
 ### Prerequisites
 
--python version >= 2.7
+python version >= 2.7
 
 ### Installing
 For python3
@@ -91,7 +91,7 @@ class Student(object):
         self.courses = courses
 
 course1 = Course("CS201", "Data Structures")
-course2 = Course('CS205", "Computer Networks")
+course2 = Course("CS205", "Computer Networks")
 
 student = Student("Danish", 24, [course1, course2])
 

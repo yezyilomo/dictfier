@@ -194,6 +194,54 @@ std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
+**What if we want to use object field on a custom field(Rename field obj field)?**
+
+This can be accomplished in two ways, You might have guessed one way to do it is to use **useobj**, by passing a function which return the value of a field which you want to use, another simple way is to use **usefield** hook. Just like **useobj** hook, **usefield** hook is used to hook/pull object field on a current query node. To use the current object field, just call **usefield** and pass a field name which you want to use/replace.
+
+Let's say we want to rename **age** field to **age_in_years** in our result. Here is how we would do this by using **usefield** hook.
+
+```python
+import dictfier
+
+class Student(object):
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+student = Student("Danish", 24)
+
+query = [
+    "name",
+    {"age_in_years": dictfier.usefield("age")}
+]
+
+std_info = dictfier.dictfy(student, query)
+print(std_info)
+```
+
+And if you want to use **useobj** hook then this is how you would do it.
+
+```python
+import dictfier
+
+class Student(object):
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+student = Student("Danish", 24)
+
+query = [
+    "name",
+    {"age_in_years": dictfier.useobj(lambda obj: obj.name)}
+]
+
+std_info = dictfier.dictfy(student, query)
+print(std_info)
+```
+
+Infact **usefield** hook is implemented by using **useobj**, so both methods are the same interms of performance, but I think you would agree with me that **usefield** is more readable in this case than **useobj**.
+
 ## How dictfier works?
 
 **dictfier** works by converting given Object into a corresponding dict **recursively(Hence works on nested objects)** by using a **Query**. So what's important here is to know how to structure right queries to extract right data from the object.

@@ -32,16 +32,16 @@ except:
 
 setup(
     name = 'dictfier',
-    version = '1.0.7',
+    version = '1.1.8',
     description = DESCRIPTION,
-    long_description=read_md('README.md'),
-    long_description_content_type='text/markdown',
-    url="https://github.com/yezyilomo/dictfier",
+    long_description = read_md('README.md'),
+    long_description_content_type = 'text/markdown',
+    url = "https://github.com/yezyilomo/dictfier",
     author = 'Yezy Ilomo',
     author_email = 'yezileliilomo@hotmail.com',
     packages = find_packages(exclude=('tests','test')),
     package_data = {},
     install_requires = [],
-    python_requires=REQUIRES_PYTHON,
-    test_suite="tests",
+    python_requires = REQUIRES_PYTHON,
+    test_suite = "tests",
 )

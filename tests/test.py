@@ -160,6 +160,25 @@ class TestAPI(unittest.TestCase):
         except AttributeError as e:
             self.fail(e)
 
+    def test_usefield_api(self):
+        class Student(object):
+            def __init__(self, name, age):
+                self.name = name
+                self.age = age
+
+        student = Student("Danish", 24)
+
+        query = [
+            "name",
+            {"age_in_years": dictfier.usefield("age")},
+        ]
+
+        try:
+            dictfier.dictfy(student, query, not_found_create=True)
+        except dictfier.exceptions.FormatError as e:
+            self.fail(e)
+        except AttributeError as e:
+            self.fail(e)
 
 if __name__ == "main":
     unittest.main()

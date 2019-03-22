@@ -10,3 +10,6 @@ def dictfy(obj, query, call_callable=False, not_found_create=False):
 
 def useobj(function):
     return factory.UseObj(function)
+
+def usefield(field_name):
+    return useobj(lambda obj: getattr(obj, field_name))

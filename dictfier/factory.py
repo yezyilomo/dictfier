@@ -43,12 +43,17 @@ def _dict(obj, query, call_callable, not_found_create, fields=None):
 
         elif isinstance(field, dict):
             # Nested field or new field
+            if fields is None:
+                     fields = {}
+                
             for sub_field in field:
                 found = hasattr(obj, sub_field)
 
                 if not_found_create and not found:
                     # Create new field
-                    if isinstance(field[sub_field], UseObj):
+                    if isinstance(field[sub_field], UseObj) and callable(field[sub_field].function(obj)) and call_callable:
+                        fields.update({sub_field: field[sub_field].function(obj)()})
+                    elif isinstance(field[sub_field], UseObj) and callable(field[sub_field].function(obj)):
                         fields.update({sub_field: field[sub_field].function(obj)})
                     else:
                         fields.update({sub_field: field[sub_field]})

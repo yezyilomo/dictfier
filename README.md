@@ -114,7 +114,7 @@ print(std_info)
 
 **What about instance methods or callable object fields?**
 
-Well we've got good news for that, **dictfier** can use callables which return values as fields, It's very simple, you just have to pass "call_callable=True" as a keyword argument to dictfy function and add your callable field to a query. Eg
+Well we've got good news for that, **dictfier** can use callables which return values as fields, It's very simple, you just have to pass "call_callable=True" as a keyword argument to dictfy function and add your callable field to a query. E.g.
 
 ```python
 import dictfier
@@ -138,7 +138,7 @@ std_info = dictfier.dictfy(student, query, call_callable=True)
 print(std_info)
 ```
 
-**You can also add your custom field by using "not_found_create=True" as a keyword argument. Eg**
+**You can also add your custom field by using "not_found_create=True" as a keyword argument. E.g.**
 
 ```python
 import dictfier
@@ -164,7 +164,7 @@ print(std_info)
 
 **What if we want to use object field on a custom field to do some computations?.**
 
-Well there is a way to do that too, **dictfier** API provides **useobj** hook which is used to hook/pull the object on a current query node. To use the current object, just define a fuction which accept one argument(which is an object) and do your computations on that function then return the result, call **useobj** and pass that defined fuction to it. 
+Well there is a way to do that too, **dictfier** API provides **useobj** hook which is used to hook or pull the object on a current query node. To use the current object, just define a fuction which accept single argument(which is an object) and perform your computations on such function and then return a result, call **useobj** and pass that defined fuction to it. 
 
 Let's say we want to calculate age of a student in terms of months from a student object with age field in terms of years. Here is how we would do this by using **useobj** hook.
 
@@ -196,9 +196,9 @@ print(std_info)
 
 **What if we want to use object field on a custom field(Rename obj field)?**
 
-This can be accomplished in two ways, As you might have guessed, one way to do it is to use **useobj** hook by passing a function which return the value of a field which you want to use, another simple way is to use **usefield** hook. Just like **useobj** hook, **usefield** hook is used to hook/pull object field on a current query node. To use the current object field, just call **usefield** and pass a field name which you want to use/replace.
+This can be accomplished in two ways, As you might have guessed, one way to do it is to use **useobj** hook by passing a function which return the value of a field which you want to use, another simple way is to use **usefield** hook. Just like **useobj** hook, **usefield** hook is used to hook or pull object field on a current query node. To use the current object field, just call **usefield** and pass a field name which you want to use or replace.
 
-Let's say we want to rename **age** field to **age_in_years** in our result. Here is how we would do this by using **usefield** hook.
+Let's say we want to rename **age** field to **age_in_years** in our results. Here is how we would do this by using **usefield** hook.
 
 ```python
 import dictfier

@@ -32,7 +32,7 @@ except:
 
 setup(
     name = 'dictfier',
-    version = '1.1.8',
+    version = '1.1.9',
     description = DESCRIPTION,
     long_description = read_md('README.md'),
     long_description_content_type = 'text/markdown',
@@ -43,5 +43,21 @@ setup(
     package_data = {},
     install_requires = [],
     python_requires = REQUIRES_PYTHON,
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'Natural Language :: English',
+        'License :: OSI Approved :: Apache Software License',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy'
+    ],
     test_suite = "tests",
 )

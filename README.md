@@ -1,5 +1,11 @@
 # dictfier
 
+[![Build Status](https://api.travis-ci.com/yezyilomo/dictfier.svg?branch=master)](https://api.travis-ci.com/yezyilomo/dictfier)
+[![image](https://img.shields.io/pypi/v/dictfier.svg)](https://pypi.org/project/dictfier/)
+[![image](https://img.shields.io/pypi/pyversions/dictfier.svg)](https://pypi.org/project/dictfier/)
+[![image](https://img.shields.io/pypi/l/dictfier.svg)](https://pypi.org/project/dictfier/)
+
+
 **dictfier** is a library to convert/serialize Python class instances(Objects) both **flat** and **nested** into a dictionary data structure. It's very useful in converting Python Objects into JSON format especially for nested objects, because they can't be handled well by json library
 
 ### Prerequisites

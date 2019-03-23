@@ -1,6 +1,4 @@
-import sys
-import os
-import io
+from codecs import open
 from setuptools import setup, find_packages
 
 DESCRIPTION = """
@@ -8,39 +6,23 @@ DESCRIPTION = """
     It's very useful in converting Python Objects into JSON format especially for nested objects, 
     because they can't be handled well by json library
     """
+with open('README.md', 'r', 'utf-8') as f:
+    readme = f.read()
+
 REQUIRES_PYTHON = '>=2.7'
-here = os.path.abspath(os.path.dirname(__file__))
-
-
-# =============================================================================
-# Convert README.md to README.rst for pypi
-# Need to install both pypandoc and pandoc 
-# - pip insall pypandoc
-# - https://pandoc.org/installing.html
-# =============================================================================
-try:
-    from pypandoc import convert
-
-    def read_md(f):
-        return convert(f, 'rst')
-except:
-    print('Warning: pypandoc module not found, unable to convert README.md to RST')
-    print('Unless you are packaging this module for distribution you can ignore this error')
-
-    def read_md(f):
-        return DESCRIPTION
 
 setup(
     name = 'dictfier',
-    version = '1.1.9',
+    version = '1.1.11',
     description = DESCRIPTION,
-    long_description = read_md('README.md'),
+    long_description = readme,
     long_description_content_type = 'text/markdown',
     url = "https://github.com/yezyilomo/dictfier",
     author = 'Yezy Ilomo',
     author_email = 'yezileliilomo@hotmail.com',
+    license = 'MIT',
     packages = find_packages(exclude=('tests','test')),
-    package_data = {},
+    package_data={'': ['LICENSE']},
     install_requires = [],
     python_requires = REQUIRES_PYTHON,
     classifiers=[

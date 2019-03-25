@@ -247,6 +247,72 @@ print(std_info)
 
 Infact **usefield** hook is implemented by using **useobj**, so both methods are the same interms of performance, but I think you would agree with me that in this case **usefield** is more readable than **useobj**.
 
+## Using dictfier as a serializer
+
+**dictfier** can be used to prepare data for serialization since it generates dictionary data structure which can easily be serialized with libraries like **json** and others. **dictfy** allows **serializer** keyword argument whose value is a function which takes object as an argument, this function is used to specify what to do when **dictfier** encounter an object which is not json serializable. In an example below serializer kwarg tells dictfier to return name if it encounter an object which is not json serializable.
+
+```python
+import json
+import dictfier
+
+class Course(object):
+    def __init__(self, code, name):
+        self.code = code
+        self.name = name
+class Student(object):
+    def __init__(self, name, age, course):
+        self.name = name
+        self.age = age
+        self.course = course
+
+course = Course("CS201", "Data Structures")
+student = Student("Danish", 24, course)
+query = [
+    "name",
+    "age",
+    "course",
+]
+# json.dumps(dictfier.dictfy(student, query))  # This will lead to
+# an error because course field on student is not json serializable.
+# to avoid this, you can use serializer kwarg as show below
+json.dumps(
+    dictfier.dictfy(student, query, serializer=lambda obj: obj.name)
+)
+```
+
+**You can use serializer kwarg for iterable objects too, here is how you can do it.**
+
+```python
+import json
+import dictfier
+
+class Course(object):
+    def __init__(self, code, name):
+        self.code = code
+        self.name = name
+class Student(object):
+    def __init__(self, name, age, courses):
+        self.name = name
+        self.age = age
+        self.courses = courses
+
+course1 = Course("CS201", "Data Structures")
+course2 = Course("CS205", "Computer Networks")
+student = Student("Danish", 24, [course1, course2])
+query = [
+    "name",
+    "age",
+    "courses"
+]
+json.dumps(
+    dictfier.dictfy(
+        student,
+        query,
+        serialize=lambda obj: [course.name for course in obj]
+    )
+)
+```
+
 ## How dictfier works?
 
 **dictfier** works by converting given Object into a corresponding dict **recursively(Hence works on nested objects)** by using a **Query**. So what's important here is to know how to structure right queries to extract right data from the object.

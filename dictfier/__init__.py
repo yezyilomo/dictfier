@@ -1,1 +1,1 @@
-from .api import dictfy, useobj, usefield
+from .api import dictfy, useobj, usefield, newfield

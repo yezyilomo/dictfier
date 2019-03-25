@@ -1,11 +1,11 @@
 from . import factory
 
-def dictfy(obj, query, call_callable=False, not_found_create=False):
+def dictfy(obj, query, call_callable=False, serializer=None):
     return factory._dict(
         obj, 
         query, 
         call_callable, 
-        not_found_create
+        serializer,
     )
 
 def useobj(function):
@@ -13,3 +13,6 @@ def useobj(function):
 
 def usefield(field_name):
     return useobj(lambda obj: getattr(obj, field_name))
+
+def newfield(value):
+    return factory.NewField(value)

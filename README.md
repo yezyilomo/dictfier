@@ -249,7 +249,7 @@ Infact **usefield** hook is implemented by using **useobj**, so both methods are
 
 ## Using dictfier as a serializer
 
-**dictfier** can be used to prepare data for serialization since it generates dictionary data structure which can easily be serialized with libraries like **json** and others. **dictfy** allows **serializer** keyword argument whose value is a function which takes object as an argument, this function is used to specify what to do when **dictfier** encounter an object which is not json serializable. In an example below serializer kwarg tells dictfier to return name if it encounter an object which is not json serializable.
+**dictfier** can be used to prepare data for serialization since it generates dictionary data structure which can easily be serialized with libraries like **json** and others. **dictfy** allows **serializer** keyword argument whose value is a function which takes object as an argument, this function is used to specify what to do when **dictfier** encounter an object which is not json serializable. In an example below serializer kwarg tells dictfier to return object's name if it encounter an object which is not json serializable.
 
 ```python
 import json
@@ -308,7 +308,7 @@ json.dumps(
     dictfier.dictfy(
         student,
         query,
-        serialize=lambda obj: [course.name for course in obj]
+        serializer=lambda obj: [course.name for course in obj]
     )
 )
 ```

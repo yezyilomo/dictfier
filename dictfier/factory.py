@@ -3,8 +3,9 @@ from .exceptions import FormatError
 
 
 class UseObj(object):
-    def __init__(self, function):
+    def __init__(self, function, fields):
         self.function = function
+        self.fields = fields
 
 
 class NewField(object):
@@ -33,15 +34,7 @@ def valid_query(obj, query):
         return False
 
 
-def is_serealizable(data):
-    try:
-        json.dumps(data)
-        return True
-    except:
-        return False
-
-
-def _dict(obj, query, call_callable, serializer, fields=None):
+def _dict(obj, query, fields=None):
     # Check if the query node is valid against object
     if not valid_query(obj, query):
         message = "Invalid Query format on \"%s\" node." % str(query)
@@ -52,15 +45,8 @@ def _dict(obj, query, call_callable, serializer, fields=None):
             # Flat field
             if fields is None:
                      fields = {}
-            if callable(getattr(obj, field)) and call_callable:
-                field_value = getattr(obj, field)()
-            else:
-                field_value = getattr(obj, field)
-            
-            if serializer is not None and not is_serealizable(field_value):
-                fields.update({field: serializer( field_value )})
-            else:
-                fields.update({field: field_value})
+            field_value = getattr(obj, field)
+            fields.update({field: field_value})
 
         elif isinstance(field, dict):
             # Nested or new field
@@ -68,26 +54,24 @@ def _dict(obj, query, call_callable, serializer, fields=None):
                      fields = {}
                 
             for sub_field in field:
-                if (isinstance(field[sub_field], NewField) and 
-                        callable(field[sub_field].value) and 
-                        call_callable):
-                    field_value = field[sub_field].value()
-                    fields.update({sub_field: field_value})
-                    continue
-                elif isinstance(field[sub_field], NewField):
+                if isinstance(field[sub_field], NewField):
                     field_value = field[sub_field].value
                     fields.update({sub_field: field_value})
                     continue
-                elif (isinstance(field[sub_field], UseObj) and 
-                        callable(field[sub_field].function(obj)) and 
-                        call_callable):
-                    sub_field_value = field[sub_field].function(obj)()
-                    fields.update({sub_field: sub_field_value})
-                    continue
                 elif isinstance(field[sub_field], UseObj):
                     sub_field_value = field[sub_field].function(obj)
-                    fields.update({sub_field: sub_field_value})
-                    continue
+                    if field[sub_field].fields is None:
+                        fields.update({sub_field: sub_field_value})
+                        continue
+                    else:
+                        # Create new child and append to parent
+                        sub_result = _dict(
+                            sub_field_value,
+                            field[sub_field].fields,
+                            fields=None,
+                        )
+                        fields.update({sub_field: sub_result})
+                        continue
                 elif (isinstance(field[sub_field], (list, tuple)) and 
                         len(field[sub_field]) < 1):
                     # Nested empty object,
@@ -115,16 +99,12 @@ def _dict(obj, query, call_callable, serializer, fields=None):
                     raise TypeError(message)
 
                 obj_field = getattr(obj, sub_field)
-                if callable(obj_field) and call_callable:
-                    obj_field = obj_field()
 
                 # This will be executed if Nested object is flat or iterable
                 # since they are the only conditions without continue statement
                 _dict(
                     obj_field,
                     field[sub_field],
-                    call_callable,
-                    serializer,
                     fields=fields[sub_field],
                 )
 
@@ -140,8 +120,6 @@ def _dict(obj, query, call_callable, serializer, fields=None):
                 _dict(
                     sub_obj,
                     field,
-                    call_callable,
-                    serializer,
                     fields=sub_field
                 )
         else:

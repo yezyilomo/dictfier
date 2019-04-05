@@ -119,7 +119,7 @@ print(std_info)
 
 **What about instance methods or callable object fields?**
 
-Well we've got good news for that, **dictfier** can use callables which return values as fields, It's very simple, you just have to pass "call_callable=True" as a keyword argument to dictfy function and add your callable field to a query. E.g.
+Well we've got good news for that, **dictfier** can use callables which return values as fields, It's very simple, you just have to pass "call=True" as a keyword argument to usefield API and add your callable field to a query. E.g.
 
 ```python
 import dictfier
@@ -136,14 +136,16 @@ student = Student("Danish", 24)
 
 query = [
     "name",
-    "age_in_days"
+    {
+        "age_in_days": dictfier.usefield("age_in_days", call=True)
+    }
 ]
 
-std_info = dictfier.dictfy(student, query, call_callable=True)
+std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
-**You can also add your custom field by using "not_found_create=True" as a keyword argument. E.g.**
+You can also add your custom field by using **newfield** API. E.g.
 
 ```python
 import dictfier
@@ -159,11 +161,11 @@ query = [
     "name",
     "age",
     {
-        "school": "St Patrick"
+        "school": dictfier.newfield("St Patrick")
     }
 ]
 
-std_info = dictfier.dictfy(student, query, not_found_create=True)
+std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
@@ -247,9 +249,7 @@ print(std_info)
 
 Infact **usefield** hook is implemented by using **useobj**, so both methods are the same interms of performance, but I think you would agree with me that in this case **usefield** is more readable than **useobj**.
 
-## Using dictfier as a serializer
-
-**dictfier** can be used to prepare data for serialization since it generates dictionary data structure which can easily be serialized with libraries like **json** and others. **dictfy** allows **serializer** keyword argument whose value is a function which takes object as an argument, this function is used to specify what to do when **dictfier** encounter an object which is not json serializable. In an example below serializer kwarg tells dictfier to return name if it encounter an object which is not json serializable.
+You can also query an object returned by **useobj** hook, This can be done by passing a query as a second argument to **useobj** or use 'fields=query' as a kwarg. E.g.
 
 ```python
 import json
@@ -270,17 +270,19 @@ student = Student("Danish", 24, course)
 query = [
     "name",
     "age",
-    "course",
+    {
+        "course": dictfier.useobj(
+            lambda obj: obj.course, 
+            ["name", "code"]  # This is a query
+        )
+    }
 ]
-# json.dumps(dictfier.dictfy(student, query))  # This will lead to
-# an error because course field on student is not json serializable.
-# to avoid this, you can use serializer kwarg as show below
-json.dumps(
-    dictfier.dictfy(student, query, serializer=lambda obj: obj.name)
-)
+
+std_info = dictfier.dictfy(student, query)
+print(std_info)
 ```
 
-**You can use serializer kwarg for iterable objects too, here is how you can do it.**
+**For iterable objects, here is how you would do it.**
 
 ```python
 import json
@@ -302,15 +304,16 @@ student = Student("Danish", 24, [course1, course2])
 query = [
     "name",
     "age",
-    "courses"
+    {
+        "courses": dictfier.useobj(
+            lambda obj: obj.courses, 
+            [["name", "code"]]  # This is a query
+        )
+    }
 ]
-json.dumps(
-    dictfier.dictfy(
-        student,
-        query,
-        serialize=lambda obj: [course.name for course in obj]
-    )
-)
+
+std_info = dictfier.dictfy(student, query)
+print(std_info)
 ```
 
 ## How dictfier works?

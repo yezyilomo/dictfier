@@ -1,9 +1,12 @@
 from . import factory
 
-def dictfy(obj, query):
+def dictfy(obj, query, flat_obj=None, nested_flat_obj=None, nested_iter_obj=None):
     return factory._dict(
         obj, 
-        query, 
+        query,
+        flat_obj,
+        nested_flat_obj,
+        nested_iter_obj,
     )
 
 

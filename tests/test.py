@@ -53,6 +53,36 @@ class TestAPI(unittest.TestCase):
         except AttributeError as e:
             self.fail(e)
 
+    def test_custom_nested_obj(self):    
+        class Course(object):
+            def __init__(self, code, name):
+                self.code = code
+                self.name = name
+        class Student(object):
+            def __init__(self, name, age, course):
+                self.name = name
+                self.age = age
+                self.course = course
+        
+        course = Course("CS201", "Data Structures")
+        student = Student("Danish", 24, course)
+        query = [
+            "name",
+            "age",
+            {
+                "course": dictfier.useobj(
+                    lambda obj: obj.course, 
+                    ["name", "code"]  # This is a query
+                )
+            }
+        ]
+        try:
+            dictfier.dictfy(student, query)
+        except dictfier.exceptions.FormatError as e:
+            self.fail(e)
+        except AttributeError as e:
+            self.fail(e)
+
     def test_iterable_nested_obj(self):
         class Course(object):
             def __init__(self, code, name):
@@ -90,24 +120,41 @@ class TestAPI(unittest.TestCase):
         except AttributeError as e:
             self.fail(e)
 
-    def test_callable_field(self):
+    def test_custom_iterable_nested_obj(self):
+        class Course(object):
+            def __init__(self, code, name):
+                self.code = code
+                self.name = name
+
         class Student(object):
-            def __init__(self, name, age):
+            def __init__(self, name, age, courses):
                 self.name = name
                 self.age = age
+                self.courses = courses
 
-            def age_in_days(self):
-                return self.age * 365
+        course1 = Course("CS201", "Data Structures")
+        course2 = Course("CS205", "Computer Networks")
 
-        student = Student("Danish", 24)
+        student = Student("Danish", 24, [course1, course2])
 
         query = [
             "name",
-            "age_in_days"
+            "age",
+            {
+                "courses": dictfier.useobj(
+                    lambda obj: obj.courses, 
+                    [
+                        [
+                            "code",
+                            "name",
+                        ]
+                    ]
+                )
+            }
         ]
 
         try:
-            dictfier.dictfy(student, query, call_callable=True)
+            dictfier.dictfy(student, query)
         except dictfier.exceptions.FormatError as e:
             self.fail(e)
         except AttributeError as e:
@@ -165,7 +212,6 @@ class TestAPI(unittest.TestCase):
             def __init__(self, name, age):
                 self.name = name
                 self.age = age
-
         student = Student("Danish", 24)
 
         query = [
@@ -180,61 +226,28 @@ class TestAPI(unittest.TestCase):
         except AttributeError as e:
             self.fail(e)
 
-    def test_serializer_kwarg_on_flat_nested_obj(self):
-        class Course(object):
-            def __init__(self, code, name):
-                self.code = code
-                self.name = name
-
+    def test_usefield_api_with_call_kwarg(self):
         class Student(object):
-            def __init__(self, name, age, course):
+            def __init__(self, name, age):
                 self.name = name
                 self.age = age
-                self.course = course
-        course = Course("CS201", "Data Structures")
-        student = Student("Danish", 24, course)
+            
+            def age_in_months(self):
+                return self.age * 12
+
+        student = Student("Danish", 24)
+
         query = [
             "name",
-            "age",
-            "course",
+            {"months": dictfier.usefield("age_in_months", call=True)},
         ]
+
         try:
-            dictfier.dictfy(student, query, serializer=lambda obj: obj.name)
+            dictfier.dictfy(student, query)
         except dictfier.exceptions.FormatError as e:
             self.fail(e)
         except AttributeError as e:
             self.fail(e)
-
-    def test_serializer_kwarg_on_iterable_nested_obj(self):
-        class Course(object):
-            def __init__(self, code, name):
-                self.code = code
-                self.name = name
-
-        class Student(object):
-            def __init__(self, name, age, courses):
-                self.name = name
-                self.age = age
-                self.courses = courses
-
-        course1 = Course("CS201", "Data Structures")
-        course2 = Course("CS205", "Computer Networks")
-
-        student = Student("Danish", 24, [course1, course2])
-
-        query = [
-            "name",
-            "age",
-            "courses"
-        ]
-
-        try:
-            dictfier.dictfy(student, query, serializer=lambda obj: [c.name for c in obj])
-        except dictfier.exceptions.FormatError as e:
-            self.fail(e)
-        except AttributeError as e:
-            self.fail(e)
-
 
     def test_query_format_violation(self):
         class Course(object):

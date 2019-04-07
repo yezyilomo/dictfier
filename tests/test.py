@@ -53,7 +53,9 @@ class TestAPI(unittest.TestCase):
         except AttributeError as e:
             self.fail(e)
 
-    def test_custom_nested_obj(self):    
+    def test_custom_nested_obj(self):
+        # Customize how dictfier obtains nested flat obj
+        # per nested field
         class Course(object):
             def __init__(self, code, name):
                 self.code = code
@@ -121,6 +123,8 @@ class TestAPI(unittest.TestCase):
             self.fail(e)
 
     def test_custom_iterable_nested_obj(self):
+        # Customize how dictfier obtains nested iterable obj
+        # per nested field
         class Course(object):
             def __init__(self, code, name):
                 self.code = code
@@ -244,6 +248,60 @@ class TestAPI(unittest.TestCase):
 
         try:
             dictfier.dictfy(student, query)
+        except dictfier.exceptions.FormatError as e:
+            self.fail(e)
+        except AttributeError as e:
+            self.fail(e)
+
+    def test_global_dictfy_config(self):
+        # Customize how dictfier obtains flat obj, 
+        # nested flat obj and nested iterable obj
+        # per dictfy call (global)
+        class Book(object):
+            def __init__(self, title, publish_date):
+                self.title = title
+                self.publish_date = publish_date
+
+        class Course(object):
+            def __init__(self, code, name, books):
+                self.code = code
+                self.name = name
+                self.books = books
+
+        class Student(object):
+            def __init__(self, name, age, course):
+                self.name = name
+                self.age = age
+                self.course = course
+
+        book1 = Book("Advanced Data Structures", "2018")
+        book2 = Book("Basic Data Structures", "2010")
+        course = Course("CS201", "Data Structures", [book1, book2])
+        student = Student("Danish", 24, course)
+        query = [
+            "name",
+            "age",
+            {
+                "course": [
+                    "name", 
+                    "code",
+                    {
+                        "books": [[
+                            "title", 
+                            "publish_date"
+                        ]]
+                    }
+                ]
+            }
+        ]
+        try:
+            dictfier.dictfy(
+                student, 
+                query, 
+                flat_obj=lambda obj, parent: obj,
+                nested_iter_obj=lambda obj, parent: obj,
+                nested_flat_obj=lambda obj, parent: obj
+            )
         except dictfier.exceptions.FormatError as e:
             self.fail(e)
         except AttributeError as e:

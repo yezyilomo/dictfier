@@ -24,7 +24,7 @@ pip install dictfier
 
 ## Getting Started
 
-**Converting a flat object into a dict**
+#### Converting a flat object into a dict
 
 ```python
 import dictfier
@@ -45,7 +45,7 @@ std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
-**Converting nested object into a dict**
+#### Converting nested object into a dict
 
 ```python
 import dictfier
@@ -79,7 +79,7 @@ std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
-**Converting object nested with iterable object into a dict**
+#### Converting object nested with iterable object into a dict
 
 ```python
 import dictfier
@@ -117,7 +117,7 @@ std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
-**What about instance methods or callable object fields?**
+#### What about instance methods or callable object fields?
 
 Well we've got good news for that, **dictfier** can use callables which return values as fields, It's very simple, you just have to pass "call=True" as a keyword argument to usefield API and add your callable field to a query. E.g.
 
@@ -169,7 +169,7 @@ std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
-**What if we want to use object field on a custom field to do some computations?.**
+#### What if we want to use object field on a custom field to do some computations?.
 
 Well there is a way to do that too, **dictfier** API provides **useobj** hook which is used to hook or pull the object on a current query node. To use the current object, just define a fuction which accept single argument(which is an object) and perform your computations on such function and then return a result, call **useobj** and pass that defined fuction to it. 
 
@@ -201,7 +201,7 @@ std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
-**What if we want to use object field on a custom field(Rename obj field)?**
+#### What if we want to use object field on a custom field(Rename obj field)?
 
 This can be accomplished in two ways, As you might have guessed, one way to do it is to use **useobj** hook by passing a function which return the value of a field which you want to use, another simple way is to use **usefield** hook. Just like **useobj** hook, **usefield** hook is used to hook or pull object field on a current query node. To use the current object field, just call **usefield** and pass a field name which you want to use or replace.
 
@@ -282,7 +282,7 @@ std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
-**For iterable objects, here is how you would do it.**
+#### For iterable objects, here is how you would do it.
 
 ```python
 import json
@@ -320,11 +320,11 @@ print(std_info)
 
 **dictfier** works by converting given Object into a corresponding dict **recursively(Hence works on nested objects)** by using a **Query**. So what's important here is to know how to structure right queries to extract right data from the object.
 
-**What's a Query anyway?**
+#### What's a Query anyway?
 
 A Query is basically a template which tells dictfier what to extract from an object. It is defined as a list or tuple of Object's fields to be extracted.
 
-**Sample conversions**.
+#### Sample conversions.
 
 When a flat student object is queried using a query below
 ```python
@@ -415,3 +415,118 @@ Putting a list or tuple inside a list or tuple of object fields is a way to decl
 Notice the list or tuple on "courses" unlike in other fields like "name" and "age", it makes "courses" iterable, This is the reason for having nested list or tuple on "courses" query.
 
 **It's pretty simple right?**
+
+
+## What if I want to customize how dictfier works?
+
+You might encounter a case where you have to change how dictfier works to get the result which you want, don't worry we have your back. **dictfier** is highly configurable, it allows you to configure how each type of object is converted into a dictionary data structure. **dictfier** configuration is divided into three parts which are
+
+i. Flat objects config(pass flat_obj=function kwarg to dictfy)
+ii. Nested flat objects config(pass nested_flat_obj=function kwarg to dictfy)
+iii. Nested iterable objects config(pass nested_iter_obj=function kwarg to dictfy)
+
+In cases above function assigned to flat_obj, nested_flat_obj or nested_iter_obj accepts two positional arguments which are field value(object) and parent object. Now consider an example of a simple ORM with two relations **Many** and **One** which are used to show how objects are related.
+
+```python
+# Customize how dictfier obtains flat obj, 
+# nested flat obj and nested iterable obj
+
+class Many(object):
+    def __init__(self, data):
+        self.data = data
+
+class One(object):
+    def __init__(self, data):
+        self.data = data
+
+class Book(object):
+    def __init__(self, pk, title, publish_date):
+        self.pk = pk
+        self.title = title
+        self.publish_date = publish_date
+
+class Mentor(object):
+    def __init__(self, pk, name, profession):
+        self.pk = pk
+        self.name = name
+        self.profession = profession
+
+class Course(object):
+    def __init__(self, pk, code, name, books):
+        self.pk = pk
+        self.code = code
+        self.name = name
+        self.books = Many(books)
+
+class Student(object):
+    def __init__(self, pk, name, age, mentor, courses):
+        self.pk = pk
+        self.name = name
+        self.age = age
+        self.mentor = One(mentor)
+        self.courses = Many(courses)
+
+book1 = Book(1, "Advanced Data Structures", "2018")
+book2 = Book(2, "Basic Data Structures", "2010")
+book3 = Book(1, "Computer Networks", "2011")
+
+course1 = Course(1, "CS201", "Data Structures", [book1, book2])
+course2 = Course(2, "CS220", "Computer Networks", [book3])
+
+mentor = Mentor(1, "Van Donald", "Software Eng")
+student = Student(1, "Danish", 24, mentor, [course1, course2])
+query = [
+    "name",
+    "age",
+    {   "mentor": [
+            "name",
+            "profession"
+        ],
+        "courses": [[
+            "name", 
+            "code",
+            {
+                "books": [[
+                    "title", 
+                    "publish_date"
+                ]]
+            }
+        ]]
+    }
+]
+
+result = dictfier.dictfy(
+    student, 
+    query, 
+    flat_obj=lambda obj, parent: obj,
+    nested_iter_obj=lambda obj, parent: obj.data,
+    nested_flat_obj=lambda obj, parent: obj.data
+)
+print(result)
+```
+
+From an example above, if you want to return primary key(pk) for nested flat or nested iterable object(which is very common in API design and serializing models) you can do it as follows.
+
+```python
+query = [
+    "name",
+    "age",
+    "mentor"
+    "courses"
+]
+
+def get_pk(obj, parent):
+    if isinstance(obj, One):
+        return obj.data.pk
+    elif isinstance(obj, Many):
+        return [rec.pk for rec in obj.data]
+
+result = dictfier.dictfy(
+    student, 
+    query, 
+    flat_obj=get_pk
+    nested_iter_obj=lambda obj, parent: obj.data,
+    nested_flat_obj=lambda obj, parent: obj.data
+)
+print(result)
+```

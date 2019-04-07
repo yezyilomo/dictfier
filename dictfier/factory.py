@@ -34,7 +34,7 @@ def valid_query(obj, query):
         return False
 
 
-def _dict(obj, query, fields=None):
+def _dict(obj, query, flat_obj, nested_flat_obj, nested_iter_obj, fields=None):
     # Check if the query node is valid against object
     if not valid_query(obj, query):
         message = "Invalid Query format on \"%s\" node." % str(query)
@@ -46,6 +46,18 @@ def _dict(obj, query, fields=None):
             if fields is None:
                      fields = {}
             field_value = getattr(obj, field)
+
+            if flat_obj is not None:
+                # Costomize how flat obj is obtained
+                # Pass both field value and obj itself 
+                # for the purpose of flexibility
+                try:
+                    field_value = flat_obj(field_value)
+                except TypeError:
+                    field_value = flat_obj(field_value, obj)
+                except Exception as e:
+                    raise e
+
             fields.update({field: field_value})
 
         elif isinstance(field, dict):
@@ -68,6 +80,9 @@ def _dict(obj, query, fields=None):
                         sub_result = _dict(
                             sub_field_value,
                             field[sub_field].fields,
+                            flat_obj,
+                            nested_flat_obj,
+                            nested_iter_obj,
                             fields=None,
                         )
                         fields.update({sub_field: sub_result})
@@ -83,11 +98,39 @@ def _dict(obj, query, fields=None):
                         len(field[sub_field]) == 1 and 
                         isinstance(field[sub_field][0], (list, tuple))):
                     # Nested object is iterable 
-                    fields.update({sub_field: []})  # Then call _dict again
+                    fields.update({sub_field: []}) 
+                    obj_field = getattr(obj, sub_field)
+                    if nested_iter_obj is not None:
+                        # Costomize how nested iterable obj is obtained
+                        # Pass both field value and obj itself 
+                        # for the purpose of flexibility
+                        try:
+                            obj_field = nested_iter_obj(obj_field)
+                        except TypeError:
+                            obj_field = nested_iter_obj(obj_field, obj)
+                        except Exception as e:
+                            raise e
+                    else:
+                        pass
+                    # Then call _dict again
                 elif (isinstance(field[sub_field], (list, tuple)) and 
                         len(field[sub_field]) > 0):
                     # Nested object is flat 
-                    fields.update({sub_field: {}})  # Then call _dict again
+                    fields.update({sub_field: {}})
+                    obj_field = getattr(obj, sub_field)
+                    if nested_flat_obj is not None:
+                        # Costomize how nested flat obj is obtained
+                        # Pass both field value and obj itself 
+                        # for the purpose of flexibility
+                        try:
+                            obj_field = nested_flat_obj(obj_field)
+                        except TypeError:
+                            obj_field = nested_flat_obj(obj_field, obj)
+                        except Exception as e:
+                            raise e
+                    else:
+                        pass
+                    # Then call _dict again
                 else:
                     # Ivalid Assignment of value to a field
                     message = (
@@ -98,13 +141,14 @@ def _dict(obj, query, fields=None):
                     ) % (str(sub_field), type(field[sub_field]).__name__)
                     raise TypeError(message)
 
-                obj_field = getattr(obj, sub_field)
-
                 # This will be executed if Nested object is flat or iterable
                 # since they are the only conditions without continue statement
                 _dict(
                     obj_field,
                     field[sub_field],
+                    flat_obj,
+                    nested_flat_obj,
+                    nested_iter_obj,
                     fields=fields[sub_field],
                 )
 
@@ -120,6 +164,9 @@ def _dict(obj, query, fields=None):
                 _dict(
                     sub_obj,
                     field,
+                    flat_obj,
+                    nested_flat_obj,
+                    nested_iter_obj,
                     fields=sub_field
                 )
         else:

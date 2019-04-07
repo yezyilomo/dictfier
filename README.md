@@ -419,11 +419,13 @@ Notice the list or tuple on "courses" unlike in other fields like "name" and "ag
 
 ## What if I want to customize how dictfier works?
 
-You might encounter a case where you have to change how dictfier works to get the result which you want, don't worry we have your back. **dictfier** is highly configurable, it allows you to configure how each type of object is converted into a dictionary data structure. **dictfier** configuration is divided into three parts which are
+You might encounter a case where you have to change how dictfier works to get the result which you want, don't worry we have got your back. **dictfier** is highly configurable, it allows you to configure how each type of object is converted into a dictionary data structure. **dictfier** configuration is divided into three parts which are
 
-i. Flat objects config(pass flat_obj=function kwarg to dictfy)
-ii. Nested flat objects config(pass nested_flat_obj=function kwarg to dictfy)
-iii. Nested iterable objects config(pass nested_iter_obj=function kwarg to dictfy)
+* Flat objects config(pass flat_obj=function kwarg to dictfy)
+
+* Nested flat objects config(pass nested_flat_obj=function kwarg to dictfy)
+
+* Nested iterable objects config(pass nested_iter_obj=function kwarg to dictfy)
 
 In cases above function assigned to flat_obj, nested_flat_obj or nested_iter_obj accepts two positional arguments which are field value(object) and parent object. Now consider an example of a simple ORM with two relations **Many** and **One** which are used to show how objects are related.
 

@@ -3,9 +3,9 @@ from .exceptions import FormatError
 
 
 class UseObj(object):
-    def __init__(self, function, fields):
+    def __init__(self, function, query):
         self.function = function
-        self.fields = fields
+        self.query = query
 
 
 class NewField(object):
@@ -34,7 +34,9 @@ def valid_query(obj, query):
         return False
 
 
-def _dict(obj, query, flat_obj, nested_flat_obj, nested_iter_obj, fields=None):
+def _dict(
+        obj, query, flat_obj, nested_flat_obj, 
+        nested_iter_obj, fields_container=None):
     # Check if the query node is valid against object
     if not valid_query(obj, query):
         message = "Invalid Query format on \"%s\" node." % str(query)
@@ -43,8 +45,8 @@ def _dict(obj, query, flat_obj, nested_flat_obj, nested_iter_obj, fields=None):
     for field in query:
         if isinstance(field, str):
             # Flat field
-            if fields is None:
-                     fields = {}
+            if fields_container is None:
+                     fields_container = {}
             field_value = getattr(obj, field)
 
             if flat_obj is not None:
@@ -58,47 +60,47 @@ def _dict(obj, query, flat_obj, nested_flat_obj, nested_iter_obj, fields=None):
                 except Exception as e:
                     raise e
 
-            fields.update({field: field_value})
+            fields_container.update({field: field_value})
 
         elif isinstance(field, dict):
             # Nested or new field
-            if fields is None:
-                     fields = {}
+            if fields_container is None:
+                     fields_container = {}
                 
             for sub_field in field:
                 if isinstance(field[sub_field], NewField):
                     field_value = field[sub_field].value
-                    fields.update({sub_field: field_value})
+                    fields_container.update({sub_field: field_value})
                     continue
                 elif isinstance(field[sub_field], UseObj):
                     sub_field_value = field[sub_field].function(obj)
-                    if field[sub_field].fields is None:
-                        fields.update({sub_field: sub_field_value})
+                    if field[sub_field].query is None:
+                        fields_container.update({sub_field: sub_field_value})
                         continue
                     else:
                         # Create new child and append to parent
                         sub_result = _dict(
                             sub_field_value,
-                            field[sub_field].fields,
+                            field[sub_field].query,
                             flat_obj,
                             nested_flat_obj,
                             nested_iter_obj,
-                            fields=None,
+                            fields_container=None,
                         )
-                        fields.update({sub_field: sub_result})
+                        fields_container.update({sub_field: sub_result})
                         continue
                 elif (isinstance(field[sub_field], (list, tuple)) and 
                         len(field[sub_field]) < 1):
                     # Nested empty object,
                     # Empty dict is the default value for empty nested objects.
-                    # Comment the line below to remove empty objects in results. [FIXME]
-                    fields.update({sub_field: {}})
+                    # Comment the line below to remove empty objects. [FIXME]
+                    fields_container.update({sub_field: {}})
                     continue
                 elif (isinstance(field[sub_field], (list, tuple)) and 
                         len(field[sub_field]) == 1 and 
                         isinstance(field[sub_field][0], (list, tuple))):
                     # Nested object is iterable 
-                    fields.update({sub_field: []}) 
+                    fields_container.update({sub_field: []}) 
                     obj_field = getattr(obj, sub_field)
                     if nested_iter_obj is not None:
                         # Costomize how nested iterable obj is obtained
@@ -116,7 +118,7 @@ def _dict(obj, query, flat_obj, nested_flat_obj, nested_iter_obj, fields=None):
                 elif (isinstance(field[sub_field], (list, tuple)) and 
                         len(field[sub_field]) > 0):
                     # Nested object is flat 
-                    fields.update({sub_field: {}})
+                    fields_container.update({sub_field: {}})
                     obj_field = getattr(obj, sub_field)
                     if nested_flat_obj is not None:
                         # Costomize how nested flat obj is obtained
@@ -149,16 +151,16 @@ def _dict(obj, query, flat_obj, nested_flat_obj, nested_iter_obj, fields=None):
                     flat_obj,
                     nested_flat_obj,
                     nested_iter_obj,
-                    fields=fields[sub_field],
+                    fields_container=fields_container[sub_field],
                 )
 
         elif isinstance(field, (list, tuple)):
             # Iterable nested object
-            if fields is None:
-                     fields = []
+            if fields_container is None:
+                     fields_container = []
             for sub_obj in obj:
                 sub_field = {}
-                fields.append(sub_field)
+                fields_container.append(sub_field)
 
                 # dictfy all objects in iterable object
                 _dict(
@@ -167,7 +169,7 @@ def _dict(obj, query, flat_obj, nested_flat_obj, nested_iter_obj, fields=None):
                     flat_obj,
                     nested_flat_obj,
                     nested_iter_obj,
-                    fields=sub_field
+                    fields_container=sub_field
                 )
         else:
             message = (
@@ -178,4 +180,4 @@ def _dict(obj, query, flat_obj, nested_flat_obj, nested_iter_obj, fields=None):
             ) % str(field)
             raise FormatError(message)
 
-    return fields
+    return fields_container

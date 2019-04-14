@@ -1,6 +1,8 @@
 from . import factory
 
-def dictfy(obj, query, flat_obj=None, nested_flat_obj=None, nested_iter_obj=None):
+def dictfy(
+        obj, query, flat_obj=None, 
+        nested_flat_obj=None, nested_iter_obj=None):
     return factory._dict(
         obj, 
         query,
@@ -10,18 +12,18 @@ def dictfy(obj, query, flat_obj=None, nested_flat_obj=None, nested_iter_obj=None
     )
 
 
-def useobj(function, fields=None):
-    return factory.UseObj(function, fields)
+def useobj(function, query=None):
+    return factory.UseObj(function, query)
 
 
 def usefield(field_name, call=False, args=tuple(), kwargs={}):
     if call:
         return useobj(
             lambda obj: getattr(obj, field_name)(*args, **kwargs), 
-            fields=None
+            query=None
         )
     else:
-        return useobj(lambda obj: getattr(obj, field_name), fields=None)
+        return useobj(lambda obj: getattr(obj, field_name), query=None)
 
 
 def newfield(value):

@@ -249,7 +249,7 @@ print(std_info)
 
 Infact **usefield** hook is implemented by using **useobj**, so both methods are the same interms of performance, but I think you would agree with me that in this case **usefield** is more readable than **useobj**.
 
-You can also query an object returned by **useobj** hook, This can be done by passing a query as a second argument to **useobj** or use 'fields=query' as a kwarg. E.g.
+You can also query an object returned by **useobj** hook, This can be done by passing a query as a second argument to **useobj** or use 'query=your_query' as a kwarg. E.g.
 
 ```python
 import json

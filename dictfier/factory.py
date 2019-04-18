@@ -63,16 +63,18 @@ def _dict(
             fields_container.update({field: field_value})
 
         elif isinstance(field, dict):
-            # Nested or new field
+            # Nested or New or Computed field
             if fields_container is None:
                      fields_container = {}
                 
             for sub_field in field:
                 if isinstance(field[sub_field], NewField):
+                    # New field
                     field_value = field[sub_field].value
                     fields_container.update({sub_field: field_value})
                     continue
                 elif isinstance(field[sub_field], UseObj):
+                    # Computed field
                     sub_field_value = field[sub_field].function(obj)
                     if field[sub_field].query is None:
                         fields_container.update({sub_field: sub_field_value})
@@ -99,7 +101,7 @@ def _dict(
                 elif (isinstance(field[sub_field], (list, tuple)) and 
                         len(field[sub_field]) == 1 and 
                         isinstance(field[sub_field][0], (list, tuple))):
-                    # Nested object is iterable 
+                    # Nested iterable field 
                     fields_container.update({sub_field: []}) 
                     obj_field = getattr(obj, sub_field)
                     if nested_iter_obj is not None:
@@ -117,7 +119,7 @@ def _dict(
                     # Then call _dict again
                 elif (isinstance(field[sub_field], (list, tuple)) and 
                         len(field[sub_field]) > 0):
-                    # Nested object is flat 
+                    # Nested flat field
                     fields_container.update({sub_field: {}})
                     obj_field = getattr(obj, sub_field)
                     if nested_flat_obj is not None:
@@ -143,7 +145,7 @@ def _dict(
                     ) % (str(sub_field), type(field[sub_field]).__name__)
                     raise TypeError(message)
 
-                # This will be executed if Nested object is flat or iterable
+                # This will be executed if Nested field is flat or iterable
                 # since they are the only conditions without continue statement
                 _dict(
                     obj_field,
@@ -155,7 +157,7 @@ def _dict(
                 )
 
         elif isinstance(field, (list, tuple)):
-            # Iterable nested object
+            # Iterable nested field
             if fields_container is None:
                      fields_container = []
             for sub_obj in obj:

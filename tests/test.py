@@ -16,12 +16,13 @@ class TestAPI(unittest.TestCase):
             "name",
             "age",
         ]
-        try:
-            dictfier.dictfy(student, query)
-        except dictfier.exceptions.FormatError as e:
-            self.fail(e)
-        except AttributeError as e:
-            self.fail(e)
+        self.assertEqual(
+            dictfier.dictfy(student, query),
+            {
+                "name": "Danish",
+                "age": 24
+            }
+        )
 
     def test_nested_obj(self):
         class Course(object):
@@ -46,12 +47,17 @@ class TestAPI(unittest.TestCase):
                 ]
             }
         ]
-        try:
-            dictfier.dictfy(student, query)
-        except dictfier.exceptions.FormatError as e:
-            self.fail(e)
-        except AttributeError as e:
-            self.fail(e)
+        self.assertEqual(
+            dictfier.dictfy(student, query),
+            {
+                "name": "Danish",
+                "age": 24,
+                "course": {
+                    "code": "CS201",
+                    "name": "Data Structures"
+                }
+            }
+        )
 
     def test_custom_nested_obj(self):
         # Customize how dictfier obtains nested flat obj
@@ -78,12 +84,18 @@ class TestAPI(unittest.TestCase):
                 )
             }
         ]
-        try:
-            dictfier.dictfy(student, query)
-        except dictfier.exceptions.FormatError as e:
-            self.fail(e)
-        except AttributeError as e:
-            self.fail(e)
+        self.assertEqual(
+            dictfier.dictfy(student, query),
+            {
+                'name': 'Danish', 
+                'age': 24, 
+                'course': 
+                {
+                    'name': 'Data Structures', 
+                    'code': 'CS201'
+                }
+            }
+        )
 
     def test_iterable_nested_obj(self):
         class Course(object):
@@ -114,13 +126,17 @@ class TestAPI(unittest.TestCase):
                 ]
             }
         ]
-
-        try:
-            dictfier.dictfy(student, query)
-        except dictfier.exceptions.FormatError as e:
-            self.fail(e)
-        except AttributeError as e:
-            self.fail(e)
+        self.assertEqual(
+            dictfier.dictfy(student, query),
+            {
+                'name': 'Danish',
+                'age': 24,
+                'courses': [
+                    {'code': 'CS201', 'name': 'Data Structures'},
+                    {'code': 'CS205', 'name': 'Computer Networks'}
+                ]
+            }
+        )
 
     def test_custom_iterable_nested_obj(self):
         # Customize how dictfier obtains nested iterable obj
@@ -156,13 +172,17 @@ class TestAPI(unittest.TestCase):
                 )
             }
         ]
-
-        try:
-            dictfier.dictfy(student, query)
-        except dictfier.exceptions.FormatError as e:
-            self.fail(e)
-        except AttributeError as e:
-            self.fail(e)
+        self.assertEqual(
+            dictfier.dictfy(student, query),
+            {
+                'name': 'Danish', 
+                'age': 24, 
+                'courses': [
+                    {'code': 'CS201', 'name': 'Data Structures'}, 
+                    {'code': 'CS205', 'name': 'Computer Networks'}
+                ]
+            }
+        )
 
     def test_newfield_api(self):
         class Student(object):
@@ -179,13 +199,14 @@ class TestAPI(unittest.TestCase):
                 "school": dictfier.newfield("St Patrick")
             }
         ]
-
-        try:
-            dictfier.dictfy(student, query)
-        except dictfier.exceptions.FormatError as e:
-            self.fail(e)
-        except AttributeError as e:
-            self.fail(e)
+        self.assertEqual(
+            dictfier.dictfy(student, query),
+            {
+                'name': 'Danish', 
+                'age': 24, 
+                'school': 'St Patrick'
+            }
+        )
 
     def test_useobj_api(self):
         class Student(object):
@@ -203,13 +224,13 @@ class TestAPI(unittest.TestCase):
             "name",
             {"age_in_months": dictfier.useobj(age_in_months)},
         ]
-
-        try:
-            dictfier.dictfy(student, query)
-        except dictfier.exceptions.FormatError as e:
-            self.fail(e)
-        except AttributeError as e:
-            self.fail(e)
+        self.assertEqual(
+            dictfier.dictfy(student, query),
+            {
+                'name': 'Danish', 
+                'age_in_months': 288
+            }
+        )
 
     def test_usefield_api(self):
         class Student(object):
@@ -222,13 +243,13 @@ class TestAPI(unittest.TestCase):
             "name",
             {"age_in_years": dictfier.usefield("age")},
         ]
-
-        try:
-            dictfier.dictfy(student, query)
-        except dictfier.exceptions.FormatError as e:
-            self.fail(e)
-        except AttributeError as e:
-            self.fail(e)
+        self.assertEqual(
+            dictfier.dictfy(student, query),
+            {
+                'name': 'Danish', 
+                'age_in_years': 24
+            }
+        )
 
     def test_usefield_api_with_call_kwarg(self):
         class Student(object):
@@ -245,13 +266,13 @@ class TestAPI(unittest.TestCase):
             "name",
             {"months": dictfier.usefield("age_in_months", call=True)},
         ]
-
-        try:
-            dictfier.dictfy(student, query)
-        except dictfier.exceptions.FormatError as e:
-            self.fail(e)
-        except AttributeError as e:
-            self.fail(e)
+        self.assertEqual(
+            dictfier.dictfy(student, query),
+            {
+                'name': 'Danish',
+                'months': 288
+            }
+        )
 
     def test_global_dictfy_config(self):
         # Customize how dictfier obtains flat obj, 
@@ -294,18 +315,27 @@ class TestAPI(unittest.TestCase):
                 ]
             }
         ]
-        try:
+        self.assertEqual(
             dictfier.dictfy(
-                student, 
-                query, 
+                student,
+                query,
                 flat_obj=lambda obj, parent: obj,
                 nested_iter_obj=lambda obj, parent: obj,
                 nested_flat_obj=lambda obj, parent: obj
-            )
-        except dictfier.exceptions.FormatError as e:
-            self.fail(e)
-        except AttributeError as e:
-            self.fail(e)
+            ),
+            {
+                'name': 'Danish', 
+                'age': 24, 
+                'course': {
+                    'name': 'Data Structures', 
+                    'code': 'CS201', 'books': [
+                        {'title': 'Advanced Data Structures', 'publish_date': '2018'}, 
+                        {'title': 'Basic Data Structures', 'publish_date': '2010'}
+                    ]
+                }
+            }
+        )
+
 
     def test_query_format_violation(self):
         class Course(object):

@@ -12,12 +12,7 @@
 python version >= 2.7
 
 ### Installing
-For python3
-```python
-pip3 install dictfier
-```
 
-For python2
 ```python
 pip install dictfier
 ```

@@ -527,3 +527,8 @@ result = dictfier.dictfy(
 )
 print(result)
 ```
+
+## Contributing [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
+
+We welcome all contributions. Please read our [CONTRIBUTING.md](https://github.com/yezyilomo/dictfier/blob/master/CONTRIBUTING.md) first. You can submit any ideas as [pull requests](https://github.com/yezyilomo/dictfier/pulls) or as [GitHub issues](https://github.com/yezyilomo/dictfier/issues). If you'd like to improve code, check out the [Code Style Guide](https://github.com/yezyilomo/dictfier/blob/master/CONTRIBUTING.md#styleguides) and have a good time!.
+

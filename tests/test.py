@@ -274,7 +274,7 @@ class TestAPI(unittest.TestCase):
             }
         )
 
-    def test_global_dictfy_config(self):
+    def test_global_dictfy_config_with_obj_param(self):
         # Customize how dictfier obtains flat obj, 
         # nested flat obj and nested iterable obj
         # per dictfy call (global)
@@ -319,9 +319,9 @@ class TestAPI(unittest.TestCase):
             dictfier.dictfy(
                 student,
                 query,
-                flat_obj=lambda obj, parent: obj,
-                nested_iter_obj=lambda obj, parent: obj,
-                nested_flat_obj=lambda obj, parent: obj
+                flat_obj=lambda obj: obj,
+                nested_iter_obj=lambda obj: obj,
+                nested_flat_obj=lambda obj: obj
             ),
             {
                 'name': 'Danish', 
@@ -336,6 +336,67 @@ class TestAPI(unittest.TestCase):
             }
         )
 
+    def test_global_dictfy_config_with_parent_and_field_name_params(self):
+        # Customize how dictfier obtains flat obj, 
+        # nested flat obj and nested iterable obj
+        # per dictfy call (global)
+        class Book(object):
+            def __init__(self, title, publish_date):
+                self.title = title
+                self.publish_date = publish_date
+
+        class Course(object):
+            def __init__(self, code, name, books):
+                self.code = code
+                self.name = name
+                self.books = books
+
+        class Student(object):
+            def __init__(self, name, age, course):
+                self.name = name
+                self.age = age
+                self.course = course
+
+        book1 = Book("Advanced Data Structures", "2018")
+        book2 = Book("Basic Data Structures", "2010")
+        course = Course("CS201", "Data Structures", [book1, book2])
+        student = Student("Danish", 24, course)
+        query = [
+            "name",
+            "age",
+            {
+                "course": [
+                    "name", 
+                    "code",
+                    {
+                        "books": [[
+                            "title", 
+                            "publish_date"
+                        ]]
+                    }
+                ]
+            }
+        ]
+        self.assertEqual(
+            dictfier.dictfy(
+                student,
+                query,
+                flat_obj=lambda obj, parent, field_name: getattr(parent, field_name),
+                nested_iter_obj=lambda obj, parent, field_name: getattr(parent, field_name),
+                nested_flat_obj=lambda obj, parent, field_name: getattr(parent, field_name)
+            ),
+            {
+                'name': 'Danish', 
+                'age': 24, 
+                'course': {
+                    'name': 'Data Structures', 
+                    'code': 'CS201', 'books': [
+                        {'title': 'Advanced Data Structures', 'publish_date': '2018'}, 
+                        {'title': 'Basic Data Structures', 'publish_date': '2010'}
+                    ]
+                }
+            }
+        )
 
     def test_query_format_violation(self):
         class Course(object):

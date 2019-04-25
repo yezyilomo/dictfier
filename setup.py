@@ -13,7 +13,7 @@ REQUIRES_PYTHON = '>=2.7'
 
 setup(
     name = 'dictfier',
-    version = '1.3.1',
+    version = '1.4.0',
     description = DESCRIPTION,
     long_description = readme,
     long_description_content_type = 'text/markdown',

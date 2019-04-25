@@ -1,6 +1,19 @@
+import sys
 import json
 from .exceptions import FormatError
 
+if sys.version_info[0] < 3:
+    from inspect import getargspec
+    get_args = getargspec
+    args_prop = "args"
+else:
+    from inspect import signature
+    get_args = signature
+    args_prop = "parameters"
+
+def args_len(function):
+        args = getattr(get_args(function), args_prop)
+        return len(args)
 
 class UseObj(object):
     def __init__(self, function, query):
@@ -51,14 +64,19 @@ def _dict(
 
             if flat_obj is not None:
                 # Costomize how flat obj is obtained
-                # Pass both field value and obj itself 
+                # Pass both field value, parent obj and field name
                 # for the purpose of flexibility
-                try:
+                args_length = args_len(flat_obj)
+                if args_length == 1:
                     field_value = flat_obj(field_value)
-                except TypeError:
+                elif args_length == 2:
                     field_value = flat_obj(field_value, obj)
-                except Exception as e:
-                    raise e
+                elif args_length == 3:
+                    field_value = flat_obj(field_value, obj, field)
+                else:
+                    raise TypeError(
+                        "%s() takes at most 3 argument (%s given)"%(flat_obj.__name__, args_length)
+                    )
 
             fields_container.update({field: field_value})
 
@@ -106,14 +124,19 @@ def _dict(
                     obj_field = getattr(obj, sub_field)
                     if nested_iter_obj is not None:
                         # Costomize how nested iterable obj is obtained
-                        # Pass both field value and obj itself 
+                        # Pass both field value, parent obj and field name
                         # for the purpose of flexibility
-                        try:
+                        args_length = args_len(nested_iter_obj)
+                        if args_length == 1:
                             obj_field = nested_iter_obj(obj_field)
-                        except TypeError:
+                        elif args_length == 2:
                             obj_field = nested_iter_obj(obj_field, obj)
-                        except Exception as e:
-                            raise e
+                        elif args_length == 3:
+                            obj_field = nested_iter_obj(obj_field, obj, sub_field)
+                        else:
+                            raise TypeError(
+                                "%s() takes at most 3 argument (%s given)"%(flat_obj.__name__, args_length)
+                            )
                     else:
                         pass
                     # Then call _dict again
@@ -124,14 +147,19 @@ def _dict(
                     obj_field = getattr(obj, sub_field)
                     if nested_flat_obj is not None:
                         # Costomize how nested flat obj is obtained
-                        # Pass both field value and obj itself 
+                        # Pass both field value, parent obj and field name
                         # for the purpose of flexibility
-                        try:
+                        args_length = args_len(nested_flat_obj)
+                        if args_length == 1:
                             obj_field = nested_flat_obj(obj_field)
-                        except TypeError:
+                        elif args_length == 2:
                             obj_field = nested_flat_obj(obj_field, obj)
-                        except Exception as e:
-                            raise e
+                        elif args_length == 3:
+                            obj_field = nested_flat_obj(obj_field, obj, sub_field)
+                        else:
+                            raise TypeError(
+                                "%s() takes at most 3 argument (%s given)"%(flat_obj.__name__, args_length)
+                            )
                     else:
                         pass
                     # Then call _dict again

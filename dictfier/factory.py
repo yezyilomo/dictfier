@@ -1,5 +1,4 @@
 import sys
-import json
 from .exceptions import FormatError
 
 if sys.version_info[0] < 3:

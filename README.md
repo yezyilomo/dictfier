@@ -422,7 +422,7 @@ You might encounter a case where you have to change how dictfier works to get th
 
 * Nested iterable objects config(pass nested_iter_obj=function kwarg to dictfy)
 
-In cases above function assigned to flat_obj, nested_flat_obj or nested_iter_obj accepts two positional arguments which are field value(object) and parent object. Now consider an example of a simple ORM with two relations **Many** and **One** which are used to show how objects are related.
+In all cases above, function assigned to flat_obj, nested_flat_obj or nested_iter_obj accepts three positional arguments which are field value(object) and parent object and field name. Now consider an example of a simple ORM with two relations **Many** and **One** which are used to show how objects are related.
 
 ```python
 # Customize how dictfier obtains flat obj, 
@@ -512,7 +512,7 @@ query = [
     "courses"
 ]
 
-def get_pk(obj, parent):
+def get_pk(obj, parent, field_name):
     if isinstance(obj, One):
         return obj.data.pk
     elif isinstance(obj, Many):

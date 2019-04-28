@@ -1,5 +1,4 @@
 import sys
-import json
 from .exceptions import FormatError
 
 if sys.version_info[0] < 3:
@@ -75,7 +74,8 @@ def _dict(
                     field_value = flat_obj(field_value, obj, field)
                 else:
                     raise TypeError(
-                        "%s() takes at most 3 argument (%s given)"%(flat_obj.__name__, args_length)
+                        "%s() takes at most 3 argument (%s given)"
+                        %(flat_obj.__name__, args_length)
                     )
 
             fields_container.update({field: field_value})
@@ -112,8 +112,9 @@ def _dict(
                 elif (isinstance(field[sub_field], (list, tuple)) and 
                         len(field[sub_field]) < 1):
                     # Nested empty object,
-                    # Empty dict is the default value for empty nested objects.
-                    # Comment the line below to remove empty objects. [FIXME]
+                    # Empty dict is the default value 
+                    # for empty nested objects
+                    # Comment the line below to remove empty objects.
                     fields_container.update({sub_field: {}})
                     continue
                 elif (isinstance(field[sub_field], (list, tuple)) and 
@@ -132,10 +133,13 @@ def _dict(
                         elif args_length == 2:
                             obj_field = nested_iter_obj(obj_field, obj)
                         elif args_length == 3:
-                            obj_field = nested_iter_obj(obj_field, obj, sub_field)
+                            obj_field = nested_iter_obj(
+                                obj_field, obj, sub_field
+                            )
                         else:
                             raise TypeError(
-                                "%s() takes at most 3 argument (%s given)"%(flat_obj.__name__, args_length)
+                                "%s() takes at most 3 argument (%s given)"
+                                %(flat_obj.__name__, args_length)
                             )
                     else:
                         pass
@@ -155,10 +159,13 @@ def _dict(
                         elif args_length == 2:
                             obj_field = nested_flat_obj(obj_field, obj)
                         elif args_length == 3:
-                            obj_field = nested_flat_obj(obj_field, obj, sub_field)
+                            obj_field = nested_flat_obj(
+                                obj_field, obj, sub_field
+                            )
                         else:
                             raise TypeError(
-                                "%s() takes at most 3 argument (%s given)"%(flat_obj.__name__, args_length)
+                                "%s() takes at most 3 argument (%s given)"
+                                %(flat_obj.__name__, args_length)
                             )
                     else:
                         pass
@@ -174,7 +181,7 @@ def _dict(
                     raise TypeError(message)
 
                 # This will be executed if Nested field is flat or iterable
-                # since they are the only conditions without continue statement
+                # since they are the only blocks without continue statement
                 _dict(
                     obj_field,
                     field[sub_field],

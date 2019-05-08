@@ -42,7 +42,6 @@ print(std_info)
 
 ```python
 # Output
-
 {'name': 'Danish', 'age': 24}
 ```
 
@@ -82,7 +81,6 @@ print(std_info)
 
 ```python
 # Output
-
 {
     'name': 'Danish', 
     'age': 24, 
@@ -130,7 +128,6 @@ print(std_info)
 
 ```python
 # Output
-
 {
     'name': 'Danish', 
     'age': 24, 
@@ -172,7 +169,6 @@ print(std_info)
 
 ```python
 # Output
-
 {'name': 'Danish', 'age_in_days': 8760}
 ```
 
@@ -203,7 +199,6 @@ print(std_info)
 
 ```python
 # Output
-
 {'name': 'Danish', 'age': 24, 'school': 'St Patrick'}
 ```
 
@@ -242,7 +237,6 @@ print(std_info)
 
 ```python
 # Output
-
 {'name': 'Danish', 'age_in_months': 288}
 ```
 
@@ -274,7 +268,6 @@ print(std_info)
 
 ```python
 # Output
-
 {'name': 'Danish', 'age_in_years': 24}
 ```
 
@@ -302,7 +295,6 @@ print(std_info)
 
 ```python
 # Output
-
 {'name': 'Danish', 'age_in_years': 24}
 ```
 
@@ -344,7 +336,6 @@ print(std_info)
 
 ```python
 # Output
-
 {
     'name': 'Danish', 
     'age': 24, 
@@ -392,7 +383,6 @@ print(std_info)
 
 ```python
 # Output
-
 {
     'name': 'Danish', 
     'age': 24, 
@@ -598,7 +588,6 @@ print(result)
 
 ```python
 # Output
-
 {
     'name': 'Danish', 
     'age': 24, 
@@ -655,11 +644,10 @@ print(result)
 
 ```python
 # Output
-
 {'name': 'Danish', 'age': 24, 'mentor': 1, 'courses': [1, 2]}
 ```
 
 ## Contributing [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
 
-We welcome all contributions. Please read our [CONTRIBUTING.md](https://github.com/yezyilomo/dictfier/blob/master/CONTRIBUTING.md) first. You can submit any ideas as [pull requests](https://github.com/yezyilomo/dictfier/pulls) or as [GitHub issues](https://github.com/yezyilomo/dictfier/issues). If you'd like to improve code, check out the [Code Style Guide](https://github.com/yezyilomo/dictfier/blob/master/CONTRIBUTING.md#styleguides) and have a good time!.
+I welcome all contributions. Please read [CONTRIBUTING.md](https://github.com/yezyilomo/dictfier/blob/master/CONTRIBUTING.md) first. You can submit any ideas as [pull requests](https://github.com/yezyilomo/dictfier/pulls) or as [GitHub issues](https://github.com/yezyilomo/dictfier/issues). If you'd like to improve code, check out the [Code Style Guide](https://github.com/yezyilomo/dictfier/blob/master/CONTRIBUTING.md#styleguides) and have a good time!.
 

@@ -40,6 +40,12 @@ std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
+```python
+# Output
+
+{'name': 'Danish', 'age': 24}
+```
+
 #### Converting nested object into a dict
 
 ```python
@@ -72,6 +78,16 @@ query = [
 
 std_info = dictfier.dictfy(student, query)
 print(std_info)
+```
+
+```python
+# Output
+
+{
+    'name': 'Danish', 
+    'age': 24, 
+    'course': {'code': 'CS201', 'name': 'Data Structures'}
+}
 ```
 
 #### Converting object nested with iterable object into a dict
@@ -112,6 +128,20 @@ std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
+```python
+# Output
+
+{
+    'name': 'Danish', 
+    'age': 24, 
+    'courses': [
+        {'code': 'CS201', 'name': 'Data Structures'}, 
+        {'code': 'CS205', 'name': 'Computer Networks'}
+    ]
+}
+```
+
+
 #### What about instance methods or callable object fields?
 
 Well we've got good news for that, **dictfier** can use callables which return values as fields, It's very simple, you just have to pass "call=True" as a keyword argument to usefield API and add your callable field to a query. E.g.
@@ -140,6 +170,13 @@ std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
+```python
+# Output
+
+{'name': 'Danish', 'age_in_days': 8760}
+```
+
+
 You can also add your custom field by using **newfield** API. E.g.
 
 ```python
@@ -163,6 +200,13 @@ query = [
 std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
+
+```python
+# Output
+
+{'name': 'Danish', 'age': 24, 'school': 'St Patrick'}
+```
+
 
 #### What if we want to use object field on a custom field to do some computations?.
 
@@ -196,6 +240,13 @@ std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
+```python
+# Output
+
+{'name': 'Danish', 'age_in_months': 288}
+```
+
+
 #### What if we want to use object field on a custom field(Rename obj field)?
 
 This can be accomplished in two ways, As you might have guessed, one way to do it is to use **useobj** hook by passing a function which return the value of a field which you want to use, another simple way is to use **usefield** hook. Just like **useobj** hook, **usefield** hook is used to hook or pull object field on a current query node. To use the current object field, just call **usefield** and pass a field name which you want to use or replace.
@@ -221,6 +272,13 @@ std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
+```python
+# Output
+
+{'name': 'Danish', 'age_in_years': 24}
+```
+
+
 And if you want to use **useobj** hook then this is how you would do it.
 
 ```python
@@ -235,12 +293,19 @@ student = Student("Danish", 24)
 
 query = [
     "name",
-    {"age_in_years": dictfier.useobj(lambda obj: obj.name)}
+    {"age_in_years": dictfier.useobj(lambda obj: obj.age)}
 ]
 
 std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
+
+```python
+# Output
+
+{'name': 'Danish', 'age_in_years': 24}
+```
+
 
 Infact **usefield** hook is implemented by using **useobj**, so both methods are the same interms of performance, but I think you would agree with me that in this case **usefield** is more readable than **useobj**.
 
@@ -277,6 +342,20 @@ std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
 
+```python
+# Output
+
+{
+    'name': 'Danish', 
+    'age': 24, 
+    'course': {
+        'name': 'Data Structures', 
+        'code': 'CS201'
+    }
+}
+```
+
+
 #### For iterable objects, here is how you would do it.
 
 ```python
@@ -310,6 +389,20 @@ query = [
 std_info = dictfier.dictfy(student, query)
 print(std_info)
 ```
+
+```python
+# Output
+
+{
+    'name': 'Danish', 
+    'age': 24, 
+    'courses': [
+        {'name': 'Data Structures', 'code': 'CS201'}, 
+        {'name': 'Computer Networks', 'code': 'CS205'}
+    ]
+}
+```
+
 
 ## How dictfier works?
 
@@ -427,6 +520,7 @@ In all cases above, function assigned to flat_obj, nested_flat_obj or nested_ite
 ```python
 # Customize how dictfier obtains flat obj, 
 # nested flat obj and nested iterable obj
+import dictfier
 
 class Many(object):
     def __init__(self, data):
@@ -502,13 +596,41 @@ result = dictfier.dictfy(
 print(result)
 ```
 
+```python
+# Output
+
+{
+    'name': 'Danish', 
+    'age': 24, 
+    'mentor': {'name': 'Van Donald', 'profession': 'Software Eng'}, 
+    'courses': [
+        {
+            'name': 'Data Structures', 
+            'code': 'CS201', 
+            'books': [
+                {'title': 'Advanced Data Structures', 'publish_date': '2018'}, 
+                {'title': 'Basic Data Structures', 'publish_date': '2010'}
+            ]
+        }, 
+        {
+            'name': 'Computer Networks', 
+            'code': 'CS220', 
+            'books': [
+                {'title': 'Computer Networks', 'publish_date': '2011'}
+            ]
+        }
+    ]
+}
+````
+
+
 From an example above, if you want to return primary key(pk) for nested flat or nested iterable object(which is very common in API design and serializing models) you can do it as follows.
 
 ```python
 query = [
     "name",
     "age",
-    "mentor"
+    "mentor",
     "courses"
 ]
 
@@ -517,15 +639,24 @@ def get_pk(obj, parent, field_name):
         return obj.data.pk
     elif isinstance(obj, Many):
         return [rec.pk for rec in obj.data]
+    else:
+        return obj
 
 result = dictfier.dictfy(
     student, 
     query, 
-    flat_obj=get_pk
+    flat_obj=get_pk,
     nested_iter_obj=lambda obj, parent: obj.data,
     nested_flat_obj=lambda obj, parent: obj.data
 )
 print(result)
+```
+
+
+```python
+# Output
+
+{'name': 'Danish', 'age': 24, 'mentor': 1, 'courses': [1, 2]}
 ```
 
 ## Contributing [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 

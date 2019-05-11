@@ -398,6 +398,73 @@ class TestAPI(unittest.TestCase):
             }
         )
 
+    def test_empty_query_against_flat_nested_and_iterable_obj(self):
+        class Book(object):
+            def __init__(self, title, publish_date):
+                self.title = title
+                self.publish_date = publish_date
+
+        class Course(object):
+            def __init__(self, code, name, book):
+                self.code = code
+                self.name = name
+                self.book = book
+
+        class Student(object):
+            def __init__(self, name, age, courses):
+                self.name = name
+                self.age = age
+                self.courses = courses
+
+        book1 = Book("Advanced Data Structures", "2018")
+        book2 = Book("Basic Data Structures", "2010")
+
+        course1 = Course("CS201", "Data Structures", book1)
+        course2 = Course("CS205", "Computer Networks", book2)
+        courses = [course1, course2]
+        
+        student = Student("Danish", 24, courses)
+
+        query1 = []  # Empty outer flat query
+
+        query2 = [[]]  # Empty outer iterable query
+
+        # Empty nested flat query
+        query3 = [
+            {
+                "book": []
+            }
+        ]
+
+        # Empty nested iterable query
+        query4 = [
+            {
+                "courses": [[]]
+            }
+        ]
+
+        self.assertEqual(
+            dictfier.dictfy(student, query1), {}
+        )
+
+        self.assertEqual(
+            dictfier.dictfy(courses, query2), [{},{}]
+        )
+
+        self.assertEqual(
+            dictfier.dictfy(course1, query3),
+            {
+                "book": {}
+            }
+        )
+
+        self.assertEqual(
+            dictfier.dictfy(student, query4),
+            {
+                "courses": [{}, {}]
+            }
+        )
+
     def test_query_format_violation(self):
         class Course(object):
             def __init__(self, code, name):

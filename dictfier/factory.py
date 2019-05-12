@@ -69,21 +69,17 @@ def valid_query(obj, query):
 
 def _dict(
         obj, query, flat_obj, nested_flat_obj, 
-        nested_iter_obj, fields_container=None):
+        nested_iter_obj):
     # Check if the query node is valid against object
     if not valid_query(obj, query):
         message = "Invalid Query format on \"%s\" node." % str(query)
         raise FormatError(message)
 
-    if not query:
-        # Outer flat empty query
-        return {}
-
+    # Initial value for flat empty query
+    fields_container = {}
     for field in query:
         if isinstance(field, str):
             # Flat field
-            if fields_container is None:
-                     fields_container = {}
             field_value = getattr(obj, field)
 
             if flat_obj is not None:
@@ -94,76 +90,96 @@ def _dict(
 
         elif isinstance(field, dict):
             # Nested or New or Computed field
-            if fields_container is None:
-                     fields_container = {}
-                
-            for sub_field in field:
-                if isinstance(field[sub_field], NewField):
+            for sub_field_name, sub_field in field.items():
+               
+                if isinstance(sub_field, NewField):
                     # New field
-                    field_value = field[sub_field].value
-                    fields_container.update({sub_field: field_value})
+
+                    field_value = sub_field.value
+                    fields_container.update({sub_field_name: field_value})
                     continue
-                elif isinstance(field[sub_field], UseObj):
+                elif isinstance(sub_field, UseObj):
                     # Computed field
-                    sub_field_value = field[sub_field].function(obj)
-                    if field[sub_field].query is None:
+
+                    computed_value = sub_field.function(obj)
+                    if sub_field.query is None:
                         # Field has no child
-                        fields_container.update({sub_field: sub_field_value})
+                        fields_container.update(
+                            {sub_field_name: computed_value}
+                        )
                         continue
                     else:
                         # Field has a child,
                         # Create a new child and append it to it's parent
                         sub_child = _dict(
-                            sub_field_value,
-                            field[sub_field].query,
+                            computed_value,
+                            sub_field.query,
                             flat_obj,
                             nested_flat_obj,
-                            nested_iter_obj,
-                            fields_container=None,
+                            nested_iter_obj
                         )
-                        fields_container.update({sub_field: sub_child})
+                        fields_container.update({sub_field_name: sub_child})
                         continue
-                elif (isinstance(field[sub_field], (list, tuple)) and 
-                        len(field[sub_field]) < 1):
-                    # Nested flat empty query
-                    fields_container.update({sub_field: {}})
+                elif (isinstance(sub_field, (list, tuple)) and 
+                        len(sub_field) == 0):
+                        # Nested flat empty query
+
+                    fields_container.update({sub_field_name: {}})
                     continue
-                elif (isinstance(field[sub_field], (list, tuple)) and 
-                        len(field[sub_field]) == 1 and 
-                        isinstance(field[sub_field][0], (list, tuple))):
-                    # Nested iterable field 
+                elif (isinstance(sub_field, (list, tuple)) and 
+                        len(sub_field) == 1 and 
+                        isinstance(sub_field[0], (list, tuple))):
+                        # Nested iterable field 
 
-                    # works for empty & non-empty nested iterable query
-                    fields_container.update({sub_field: []}) 
-
-                    obj_field = getattr(obj, sub_field)
+                    obj_field = getattr(obj, sub_field_name)
                     if nested_iter_obj is not None:
                         # Costomize how nested iterable obj is obtained
                         obj_field = custom(
                             nested_iter_obj, 
                             obj_field, 
                             obj, 
-                            sub_field
+                            sub_field_name
                         )
-                    else:
-                        pass
-                    # Then call _dict again
-                elif (isinstance(field[sub_field], (list, tuple)) and 
-                        len(field[sub_field]) > 0):
-                    # Nested flat field
-                    fields_container.update({sub_field: {}})
-                    obj_field = getattr(obj, sub_field)
+
+                    child_container = []
+                    for sub_obj in obj_field:
+                        # dictfy all objects on iterable object
+                        child = _dict(
+                            sub_obj,
+                            sub_field[0],
+                            flat_obj,
+                            nested_flat_obj,
+                            nested_iter_obj
+                        )
+                        child_container.append(child)
+                        
+                    fields_container.update(
+                        {sub_field_name: child_container}
+                    )
+                    continue
+            
+                elif (isinstance(sub_field, (list, tuple)) and 
+                        len(sub_field) > 0):
+                        # Nested flat field
+
+                    obj_field = getattr(obj, sub_field_name)
                     if nested_flat_obj is not None:
                         # Costomize how nested flat obj is obtained
                         obj_field = custom(
                             nested_flat_obj, 
                             obj_field, 
                             obj, 
-                            sub_field
+                            sub_field_name
                         )
-                    else:
-                        pass
-                    # Then call _dict again
+
+                    child = _dict(
+                        obj_field,
+                        sub_field,
+                        flat_obj,
+                        nested_flat_obj,
+                        nested_iter_obj
+                    )
+                    fields_container.update({sub_field_name: child}) 
                 else:
                     # Ivalid Assignment of value to a field
                     message = (
@@ -171,39 +187,24 @@ def _dict(
                         "NewField or UseObj, not '%s'. "
                         "Refer to 'useobj', 'usefield' or 'newfield' "
                         "APIs for more details "
-                    ) % (str(sub_field), type(field[sub_field]).__name__)
+                    ) % (str(sub_field_name), type(sub_field).__name__)
                     raise TypeError(message)
 
-                # This will be executed if Nested field is flat or iterable
-                # since they are the only blocks without continue statement
-                _dict(
-                    obj_field,
-                    field[sub_field],
-                    flat_obj,
-                    nested_flat_obj,
-                    nested_iter_obj,
-                    fields_container=fields_container[sub_field],
-                )
-
         elif isinstance(field, (list, tuple)):
-            # Iterable nested query or Iterable outer query
-            if fields_container is None:
-                     # Iterable outer query
-                     fields_container = []
+            # Iterable field
 
+            # Initial value for iterable empty query
+            fields_container = []
             for sub_obj in obj:
-                sub_field = {}
-                fields_container.append(sub_field)
-
-                # dictfy all objects in iterable object
-                _dict(
+                # dictfy all objects on iterable object
+                child = _dict(
                     sub_obj,
                     field,
                     flat_obj,
                     nested_flat_obj,
-                    nested_iter_obj,
-                    fields_container=sub_field
+                    nested_iter_obj
                 )
+                fields_container.append(child)
         else:
             message = (
                 "Wrong formating of Query on '%s' node, "

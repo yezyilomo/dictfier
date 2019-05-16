@@ -2,8 +2,8 @@ from codecs import open
 from setuptools import setup, find_packages
 
 DESCRIPTION = """
-    Python library to convert Python class instances(Objects) both flat and nested into a dictionary data structure. 
-    It's very useful in converting Python Objects into JSON format especially for nested objects, 
+    Python library to convert Python class instances(Objects) both flat and nested into a dictionary data structure.
+    It's very useful in converting Python Objects into JSON format especially for nested objects,
     because they can't be handled well by json library
     """
 with open('README.md', 'r', 'utf-8') as f:
@@ -13,7 +13,7 @@ REQUIRES_PYTHON = '>=2.7'
 
 setup(
     name = 'dictfier',
-    version = '1.4.2',
+    version = '1.5.0',
     description = DESCRIPTION,
     long_description = readme,
     long_description_content_type = 'text/markdown',

@@ -1,1 +1,2 @@
-from .api import dictfy, useobj, usefield, newfield
+from .api import dictfy, filter, useobj, usefield, newfield
+from .exceptions import FormatError

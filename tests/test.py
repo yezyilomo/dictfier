@@ -3,7 +3,7 @@ import unittest
 import dictfier
 
 
-class TestAPI(unittest.TestCase):
+class TestDictfyAPI(unittest.TestCase):
     def test_flat_obj(self):
         class Student(object):
             def __init__(self, name, age):
@@ -71,7 +71,7 @@ class TestAPI(unittest.TestCase):
                 self.name = name
                 self.age = age
                 self.course = course
-        
+
         course = Course("CS201", "Data Structures")
         student = Student("Danish", 24, course)
         query = [
@@ -79,7 +79,7 @@ class TestAPI(unittest.TestCase):
             "age",
             {
                 "course": dictfier.useobj(
-                    lambda obj: obj.course, 
+                    lambda obj: obj.course,
                     ["name", "code"]  # This is a query
                 )
             }
@@ -87,11 +87,11 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(
             dictfier.dictfy(student, query),
             {
-                'name': 'Danish', 
-                'age': 24, 
-                'course': 
+                'name': 'Danish',
+                'age': 24,
+                'course':
                 {
-                    'name': 'Data Structures', 
+                    'name': 'Data Structures',
                     'code': 'CS201'
                 }
             }
@@ -162,7 +162,7 @@ class TestAPI(unittest.TestCase):
             "age",
             {
                 "courses": dictfier.useobj(
-                    lambda obj: obj.courses, 
+                    lambda obj: obj.courses,
                     [
                         [
                             "code",
@@ -175,10 +175,10 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(
             dictfier.dictfy(student, query),
             {
-                'name': 'Danish', 
-                'age': 24, 
+                'name': 'Danish',
+                'age': 24,
                 'courses': [
-                    {'code': 'CS201', 'name': 'Data Structures'}, 
+                    {'code': 'CS201', 'name': 'Data Structures'},
                     {'code': 'CS205', 'name': 'Computer Networks'}
                 ]
             }
@@ -202,8 +202,8 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(
             dictfier.dictfy(student, query),
             {
-                'name': 'Danish', 
-                'age': 24, 
+                'name': 'Danish',
+                'age': 24,
                 'school': 'St Patrick'
             }
         )
@@ -227,7 +227,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(
             dictfier.dictfy(student, query),
             {
-                'name': 'Danish', 
+                'name': 'Danish',
                 'age_in_months': 288
             }
         )
@@ -246,7 +246,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(
             dictfier.dictfy(student, query),
             {
-                'name': 'Danish', 
+                'name': 'Danish',
                 'age_in_years': 24
             }
         )
@@ -256,7 +256,7 @@ class TestAPI(unittest.TestCase):
             def __init__(self, name, age):
                 self.name = name
                 self.age = age
-            
+
             def age_in_months(self):
                 return self.age * 12
 
@@ -275,7 +275,7 @@ class TestAPI(unittest.TestCase):
         )
 
     def test_global_dictfy_config_with_obj_param(self):
-        # Customize how dictfier obtains flat obj, 
+        # Customize how dictfier obtains flat obj,
         # nested flat obj and nested iterable obj
         # per dictfy call (global)
         class Book(object):
@@ -304,11 +304,11 @@ class TestAPI(unittest.TestCase):
             "age",
             {
                 "course": [
-                    "name", 
+                    "name",
                     "code",
                     {
                         "books": [[
-                            "title", 
+                            "title",
                             "publish_date"
                         ]]
                     }
@@ -324,12 +324,12 @@ class TestAPI(unittest.TestCase):
                 nested_flat_obj=lambda obj: obj
             ),
             {
-                'name': 'Danish', 
-                'age': 24, 
+                'name': 'Danish',
+                'age': 24,
                 'course': {
-                    'name': 'Data Structures', 
+                    'name': 'Data Structures',
                     'code': 'CS201', 'books': [
-                        {'title': 'Advanced Data Structures', 'publish_date': '2018'}, 
+                        {'title': 'Advanced Data Structures', 'publish_date': '2018'},
                         {'title': 'Basic Data Structures', 'publish_date': '2010'}
                     ]
                 }
@@ -337,7 +337,7 @@ class TestAPI(unittest.TestCase):
         )
 
     def test_global_dictfy_config_with_parent_and_field_name_params(self):
-        # Customize how dictfier obtains flat obj, 
+        # Customize how dictfier obtains flat obj,
         # nested flat obj and nested iterable obj
         # per dictfy call (global)
         class Book(object):
@@ -366,11 +366,11 @@ class TestAPI(unittest.TestCase):
             "age",
             {
                 "course": [
-                    "name", 
+                    "name",
                     "code",
                     {
                         "books": [[
-                            "title", 
+                            "title",
                             "publish_date"
                         ]]
                     }
@@ -386,12 +386,12 @@ class TestAPI(unittest.TestCase):
                 nested_flat_obj=lambda obj, parent, field_name: getattr(parent, field_name)
             ),
             {
-                'name': 'Danish', 
-                'age': 24, 
+                'name': 'Danish',
+                'age': 24,
                 'course': {
-                    'name': 'Data Structures', 
+                    'name': 'Data Structures',
                     'code': 'CS201', 'books': [
-                        {'title': 'Advanced Data Structures', 'publish_date': '2018'}, 
+                        {'title': 'Advanced Data Structures', 'publish_date': '2018'},
                         {'title': 'Basic Data Structures', 'publish_date': '2010'}
                     ]
                 }
@@ -422,7 +422,7 @@ class TestAPI(unittest.TestCase):
         course1 = Course("CS201", "Data Structures", book1)
         course2 = Course("CS205", "Computer Networks", book2)
         courses = [course1, course2]
-        
+
         student = Student("Danish", 24, courses)
 
         query1 = []  # Empty outer flat query
@@ -537,6 +537,226 @@ class TestAPI(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             dictfier.dictfy(student, query5)
+
+
+
+
+#****************  Filter API Tests  ***********************#
+
+class TestFilterAPI(unittest.TestCase):
+    def test_flat_dict(self):
+        student = {
+            "name": "Danish",
+            "age": 24
+        }
+
+        query = [
+            "name",
+            "age",
+        ]
+        self.assertEqual(
+            dictfier.filter(student, query),
+            {
+                "name": "Danish",
+                "age": 24
+            }
+        )
+
+    def test_nested_dict(self):
+        student = {
+            "name": "Danish",
+            "age": 24,
+            "course": {
+                "code": "CS201",
+                "name": "Data Structures"
+            }
+        }
+
+        query = [
+            "name",
+            "age",
+            {
+                "course": [
+                    "code",
+                    "name",
+                ]
+            }
+        ]
+        self.assertEqual(
+            dictfier.filter(student, query),
+            {
+                "name": "Danish",
+                "age": 24,
+                "course": {
+                    "code": "CS201",
+                    "name": "Data Structures"
+                }
+            }
+        )
+
+    def test_iterable_nested_dict(self):
+        student = {
+            'name': 'Danish',
+            'age': 24,
+            'courses': [
+                {'code': 'CS201', 'name': 'Data Structures'},
+                {'code': 'CS205', 'name': 'Computer Networks'}
+            ]
+        }
+
+        query = [
+            "name",
+            "age",
+            {
+                "courses": [
+                    [
+                        "code",
+                        "name",
+                    ]
+                ]
+            }
+        ]
+        self.assertEqual(
+            dictfier.filter(student, query),
+            {
+                'name': 'Danish',
+                'age': 24,
+                'courses': [
+                    {'code': 'CS201', 'name': 'Data Structures'},
+                    {'code': 'CS205', 'name': 'Computer Networks'}
+                ]
+            }
+        )
+
+    def test_empty_query_against_flat_nested_and_iterable_dict(self):
+        book1 = {'title': 'Advanced Data Structures', 'publish_date': '2018'},
+        book2 = {'title': 'Basic Data Structures', 'publish_date': '2010'}
+
+        course1 = {'code': 'CS201', 'name': 'Data Structures', 'book': book1}
+        course2 = {'code': 'CS205', 'name': 'Computer Networks', 'book': book2}
+        courses = [course1, course2]
+
+        student = {
+            'name': 'Danish',
+            'age': 24,
+            'courses': [
+                {'code': 'CS201', 'name': 'Data Structures'},
+                {'code': 'CS205', 'name': 'Computer Networks'}
+            ]
+        }
+
+        query1 = []  # Empty outer flat query
+
+        query2 = [[]]  # Empty outer iterable query
+
+        # Empty nested flat query
+        query3 = [
+            {
+                "book": []
+            }
+        ]
+
+        # Empty nested iterable query
+        query4 = [
+            {
+                "courses": [[]]
+            }
+        ]
+
+        self.assertEqual(
+            dictfier.filter(student, query1), {}
+        )
+
+        self.assertEqual(
+            dictfier.filter(courses, query2), [{},{}]
+        )
+
+        self.assertEqual(
+            dictfier.filter(course1, query3),
+            {
+                "book": {}
+            }
+        )
+
+        self.assertEqual(
+            dictfier.filter(student, query4),
+            {
+                "courses": [{}, {}]
+            }
+        )
+
+    def test_query_format_violation(self):
+        book1 = {'title': 'Advanced Data Structures', 'publish_date': '2018'},
+        book2 = {'title': 'Basic Data Structures', 'publish_date': '2010'}
+
+        course1 = {'code': 'CS201', 'name': 'Data Structures', 'book': book1}
+        course2 = {'code': 'CS205', 'name': 'Computer Networks', 'book': book2}
+        courses = [course1, course2]
+
+        student = {
+            'name': 'Danish',
+            'age': 24,
+            'courses': [
+                course1,
+                course2
+            ]
+        }
+
+        query1 = [
+            "name",
+            "age",
+            566  # FormatError
+        ]
+        query2 = [
+            "name",
+            "age",
+            ["name"]  # FormatError
+        ]
+
+        query3 = [
+            "name",
+            "age",
+            {
+                "courses": [
+                    ["code", "name"],
+                    "name", # FormatError
+                ]
+            }
+        ]
+
+        query4 = [
+            "name",
+            "age",
+            {
+                "courses": [
+                    "name",  # FormatError
+                    ["code", "name"],
+                ]
+            }
+        ]
+
+        query5 = [
+            "name",
+            "age",
+            {
+                "class": "HBO"  # TypeError
+            }
+        ]
+
+        with self.assertRaises(dictfier.exceptions.FormatError):
+            dictfier.filter(student, query1)
+
+        with self.assertRaises(dictfier.exceptions.FormatError):
+            dictfier.filter(student, query2)
+
+        with self.assertRaises(dictfier.exceptions.FormatError):
+            dictfier.filter(student, query3)
+
+        with self.assertRaises(dictfier.exceptions.FormatError):
+            dictfier.filter(student, query4)
+
+        with self.assertRaises(TypeError):
+            dictfier.filter(student, query5)
 
 
 if __name__ == "main":

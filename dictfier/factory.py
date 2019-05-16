@@ -46,7 +46,7 @@ def custom(customr, field_value, parent_obj, field_name):
         )
 
 
-def valid_query(obj, query):
+def valid_query(query):
     flat_or_nested = all(
         map(
             lambda node : isinstance(node, (str, dict)),
@@ -68,10 +68,10 @@ def valid_query(obj, query):
 
 
 def _dict(
-        obj, query, flat_obj, nested_flat_obj, 
+        obj, query, flat_obj, nested_flat_obj,
         nested_iter_obj):
     # Check if the query node is valid against object
-    if not valid_query(obj, query):
+    if not valid_query(query):
         message = "Invalid Query format on \"%s\" node." % str(query)
         raise FormatError(message)
 
@@ -91,7 +91,7 @@ def _dict(
         elif isinstance(field, dict):
             # Nested or New or Computed field
             for sub_field_name, sub_field in field.items():
-               
+
                 if isinstance(sub_field, NewField):
                     # New field
 
@@ -120,24 +120,24 @@ def _dict(
                         )
                         fields_container.update({sub_field_name: sub_child})
                         continue
-                elif (isinstance(sub_field, (list, tuple)) and 
+                elif (isinstance(sub_field, (list, tuple)) and
                         len(sub_field) == 0):
                         # Nested flat empty query
 
                     fields_container.update({sub_field_name: {}})
                     continue
-                elif (isinstance(sub_field, (list, tuple)) and 
-                        len(sub_field) == 1 and 
+                elif (isinstance(sub_field, (list, tuple)) and
+                        len(sub_field) == 1 and
                         isinstance(sub_field[0], (list, tuple))):
-                        # Nested iterable field 
+                        # Nested iterable field
 
                     obj_field = getattr(obj, sub_field_name)
                     if nested_iter_obj is not None:
                         # Costomize how nested iterable obj is obtained
                         obj_field = custom(
-                            nested_iter_obj, 
-                            obj_field, 
-                            obj, 
+                            nested_iter_obj,
+                            obj_field,
+                            obj,
                             sub_field_name
                         )
 
@@ -152,13 +152,13 @@ def _dict(
                             nested_iter_obj
                         )
                         child_container.append(child)
-                        
+
                     fields_container.update(
                         {sub_field_name: child_container}
                     )
                     continue
-            
-                elif (isinstance(sub_field, (list, tuple)) and 
+
+                elif (isinstance(sub_field, (list, tuple)) and
                         len(sub_field) > 0):
                         # Nested flat field
 
@@ -166,9 +166,9 @@ def _dict(
                     if nested_flat_obj is not None:
                         # Costomize how nested flat obj is obtained
                         obj_field = custom(
-                            nested_flat_obj, 
-                            obj_field, 
-                            obj, 
+                            nested_flat_obj,
+                            obj_field,
+                            obj,
                             sub_field_name
                         )
 
@@ -179,7 +179,7 @@ def _dict(
                         nested_flat_obj,
                         nested_iter_obj
                     )
-                    fields_container.update({sub_field_name: child}) 
+                    fields_container.update({sub_field_name: child})
                 else:
                     # Ivalid Assignment of value to a field
                     message = (

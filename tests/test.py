@@ -3,6 +3,8 @@ import unittest
 import dictfier
 
 
+#****************  dictify API Tests  ***********************#
+
 class TestDictfyAPI(unittest.TestCase):
     def test_flat_obj(self):
         class Student(object):
@@ -232,7 +234,7 @@ class TestDictfyAPI(unittest.TestCase):
             }
         )
 
-    def test_usefield_api(self):
+    def test_objfield_api(self):
         class Student(object):
             def __init__(self, name, age):
                 self.name = name
@@ -241,7 +243,7 @@ class TestDictfyAPI(unittest.TestCase):
 
         query = [
             "name",
-            {"age_in_years": dictfier.usefield("age")},
+            {"age_in_years": dictfier.objfield("age")},
         ]
         self.assertEqual(
             dictfier.dictfy(student, query),
@@ -251,7 +253,7 @@ class TestDictfyAPI(unittest.TestCase):
             }
         )
 
-    def test_usefield_api_with_call_kwarg(self):
+    def test_objfield_api_with_call_kwarg(self):
         class Student(object):
             def __init__(self, name, age):
                 self.name = name
@@ -264,7 +266,7 @@ class TestDictfyAPI(unittest.TestCase):
 
         query = [
             "name",
-            {"months": dictfier.usefield("age_in_months", call=True)},
+            {"months": dictfier.objfield("age_in_months", call=True)},
         ]
         self.assertEqual(
             dictfier.dictfy(student, query),
@@ -540,8 +542,7 @@ class TestDictfyAPI(unittest.TestCase):
 
 
 
-
-#****************  Filter API Tests  ***********************#
+#****************  filter API Tests  ***********************#
 
 class TestFilterAPI(unittest.TestCase):
     def test_flat_dict(self):
@@ -594,6 +595,42 @@ class TestFilterAPI(unittest.TestCase):
             }
         )
 
+    def test_custom_nested_dict(self):
+        # Customize how dictfier obtains nested flat obj
+        # per nested field
+        student = {
+                'name': 'Danish',
+                'age': 24,
+                'course':
+                {
+                    'name': 'Data Structures',
+                    'code': 'CS201'
+                }
+        }
+
+        query = [
+            "name",
+            "age",
+            {
+                "course": dictfier.useobj(
+                    lambda obj: obj["course"],
+                    ["name", "code"]  # This is a query
+                )
+            }
+        ]
+        self.assertEqual(
+            dictfier.filter(student, query),
+            {
+                'name': 'Danish',
+                'age': 24,
+                'course':
+                {
+                    'name': 'Data Structures',
+                    'code': 'CS201'
+                }
+            }
+        )
+
     def test_iterable_nested_dict(self):
         student = {
             'name': 'Danish',
@@ -625,6 +662,227 @@ class TestFilterAPI(unittest.TestCase):
                     {'code': 'CS201', 'name': 'Data Structures'},
                     {'code': 'CS205', 'name': 'Computer Networks'}
                 ]
+            }
+        )
+
+    def test_custom_iterable_nested_dict(self):
+        # Customize how dictfier obtains nested iterable obj
+        # per nested field
+        student = {
+                'name': 'Danish',
+                'age': 24,
+                'courses': [
+                    {'code': 'CS201', 'name': 'Data Structures'},
+                    {'code': 'CS205', 'name': 'Computer Networks'}
+                ]
+        }
+        query = [
+            "name",
+            "age",
+            {
+                "courses": dictfier.useobj(
+                    lambda obj: obj["courses"],
+                    [
+                        [
+                            "code",
+                            "name",
+                        ]
+                    ]
+                )
+            }
+        ]
+        self.assertEqual(
+            dictfier.filter(student, query),
+            {
+                'name': 'Danish',
+                'age': 24,
+                'courses': [
+                    {'code': 'CS201', 'name': 'Data Structures'},
+                    {'code': 'CS205', 'name': 'Computer Networks'}
+                ]
+            }
+        )
+
+    def test_newfield_api(self):
+        student = {
+                'name': 'Danish',
+                'age': 24
+        }
+        query = [
+            "name",
+            "age",
+            {
+                "school": dictfier.newfield("St Patrick")
+            }
+        ]
+        self.assertEqual(
+            dictfier.filter(student, query),
+            {
+                'name': 'Danish',
+                'age': 24,
+                'school': 'St Patrick'
+            }
+        )
+
+    def test_useobj_api(self):
+        student = {
+                'name': 'Danish',
+                'age': 24
+        }
+        def age_in_months(obj):
+            # Do the computation here then return the result
+            return obj["age"] * 12
+
+        query = [
+            "name",
+            {"age_in_months": dictfier.useobj(age_in_months)},
+        ]
+        self.assertEqual(
+            dictfier.filter(student, query),
+            {
+                'name': 'Danish',
+                'age_in_months': 288
+            }
+        )
+
+    def test_dictfield_api(self):
+        student = {
+                'name': 'Danish',
+                'age': 24
+        }
+        query = [
+            "name",
+            {"age_in_years": dictfier.dictfield("age")},
+        ]
+        self.assertEqual(
+            dictfier.filter(student, query),
+            {
+                'name': 'Danish',
+                'age_in_years': 24
+            }
+        )
+
+    def test_dictfield_api_with_call_kwarg(self):
+        def age_in_months():
+            return 24 * 12
+        student = {
+                'name': 'Danish',
+                'age': 24,
+                'age_in_months': age_in_months
+        }
+        query = [
+            "name",
+            {"months": dictfier.dictfield("age_in_months", call=True)},
+        ]
+        self.assertEqual(
+            dictfier.filter(student, query),
+            {
+                'name': 'Danish',
+                'months': 288
+            }
+        )
+
+    def test_global_filter_config_with_obj_param(self):
+        # Customize how dictfier obtains flat obj,
+        # nested flat obj and nested iterable obj
+        # per filter call (global)
+        student = {
+                'name': 'Danish',
+                'age': 24,
+                'course': {
+                    'name': 'Data Structures',
+                    'code': 'CS201', 'books': [
+                        {'title': 'Advanced Data Structures', 'publish_date': '2018'},
+                        {'title': 'Basic Data Structures', 'publish_date': '2010'}
+                    ]
+                }
+        }
+        query = [
+            "name",
+            "age",
+            {
+                "course": [
+                    "name",
+                    "code",
+                    {
+                        "books": [[
+                            "title",
+                            "publish_date"
+                        ]]
+                    }
+                ]
+            }
+        ]
+        self.assertEqual(
+            dictfier.filter(
+                student,
+                query,
+                flat_obj=lambda obj: obj,
+                nested_iter_obj=lambda obj: obj,
+                nested_flat_obj=lambda obj: obj
+            ),
+            {
+                'name': 'Danish',
+                'age': 24,
+                'course': {
+                    'name': 'Data Structures',
+                    'code': 'CS201', 'books': [
+                        {'title': 'Advanced Data Structures', 'publish_date': '2018'},
+                        {'title': 'Basic Data Structures', 'publish_date': '2010'}
+                    ]
+                }
+            }
+        )
+
+    def test_global_filter_config_with_parent_and_field_name_params(self):
+        # Customize how dictfier obtains flat obj,
+        # nested flat obj and nested iterable obj
+        # per filter call (global)
+        student = {
+                'name': 'Danish',
+                'age': 24,
+                'course': {
+                    'name': 'Data Structures',
+                    'code': 'CS201', 'books': [
+                        {'title': 'Advanced Data Structures', 'publish_date': '2018'},
+                        {'title': 'Basic Data Structures', 'publish_date': '2010'}
+                    ]
+                }
+        }
+        query = [
+            "name",
+            "age",
+            {
+                "course": [
+                    "name",
+                    "code",
+                    {
+                        "books": [[
+                            "title",
+                            "publish_date"
+                        ]]
+                    }
+                ]
+            }
+        ]
+        self.assertEqual(
+            dictfier.filter(
+                student,
+                query,
+                flat_obj=lambda obj, parent, field_name: parent[field_name],
+                nested_iter_obj=lambda obj, parent, field_name: parent[field_name],
+                nested_flat_obj=lambda obj, parent, field_name: parent[field_name]
+            ),
+            {
+                'name': 'Danish',
+                'age': 24,
+                'course': {
+                    'name': 'Data Structures',
+                    'code': 'CS201', 'books': [
+                        {'title': 'Advanced Data Structures', 'publish_date': '2018'},
+                        {'title': 'Basic Data Structures', 'publish_date': '2010'}
+                    ]
+                }
             }
         )
 

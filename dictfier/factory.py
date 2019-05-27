@@ -70,7 +70,7 @@ def valid_query(query):
 def _dict(
         obj, query, flat_obj, nested_flat_obj,
         nested_iter_obj):
-    # Check if the query node is valid against object
+    # Check if the query node is valid
     if not valid_query(query):
         message = "Invalid Query format on \"%s\" node." % str(query)
         raise FormatError(message)
@@ -185,8 +185,8 @@ def _dict(
                     message = (
                         "'%s' value must be of type "
                         "NewField or UseObj, not '%s'. "
-                        "Refer to 'useobj', 'usefield' or 'newfield' "
-                        "APIs for more details "
+                        "Refer to 'useobj', 'objfield' or 'newfield' "
+                        "APIs for more details."
                     ) % (str(sub_field_name), type(sub_field).__name__)
                     raise TypeError(message)
 

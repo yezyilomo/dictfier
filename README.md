@@ -54,7 +54,7 @@ class Course(object):
     def __init__(self, code, name):
         self.code = code
         self.name = name
-        
+
 class Student(object):
     def __init__(self, name, age, course):
         self.name = name
@@ -82,8 +82,8 @@ print(std_info)
 ```python
 # Output
 {
-    'name': 'Danish', 
-    'age': 24, 
+    'name': 'Danish',
+    'age': 24,
     'course': {'code': 'CS201', 'name': 'Data Structures'}
 }
 ```
@@ -97,7 +97,7 @@ class Course(object):
     def __init__(self, code, name):
         self.code = code
         self.name = name
-        
+
 class Student(object):
     def __init__(self, name, age, courses):
         self.name = name
@@ -129,10 +129,10 @@ print(std_info)
 ```python
 # Output
 {
-    'name': 'Danish', 
-    'age': 24, 
+    'name': 'Danish',
+    'age': 24,
     'courses': [
-        {'code': 'CS201', 'name': 'Data Structures'}, 
+        {'code': 'CS201', 'name': 'Data Structures'},
         {'code': 'CS205', 'name': 'Computer Networks'}
     ]
 }
@@ -141,7 +141,7 @@ print(std_info)
 
 #### What about instance methods or callable object fields?
 
-Well we've got good news for that, **dictfier** can use callables which return values as fields, It's very simple, you just have to pass "call=True" as a keyword argument to usefield API and add your callable field to a query. E.g.
+Well we've got good news for that, **dictfier** can use callables which return values as fields, It's very simple, you just have to pass "call=True" as a keyword argument to objfield API and add your callable field to a query. E.g.
 
 ```python
 import dictfier
@@ -159,7 +159,7 @@ student = Student("Danish", 24)
 query = [
     "name",
     {
-        "age_in_days": dictfier.usefield("age_in_days", call=True)
+        "age_in_days": dictfier.objfield("age_in_days", call=True)
     }
 ]
 
@@ -205,7 +205,7 @@ print(std_info)
 
 #### What if we want to use object field on a custom field to do some computations?.
 
-Well there is a way to do that too, **dictfier** API provides **useobj** hook which is used to hook or pull the object on a current query node. To use the current object, just define a fuction which accept single argument(which is an object) and perform your computations on such function and then return a result, call **useobj** and pass that defined fuction to it. 
+Well there is a way to do that too, **dictfier** API provides **useobj** hook which is used to hook or pull the object on a current query node. To use the current object, just define a fuction which accept single argument(which is an object) and perform your computations on such function and then return a result, call **useobj** and pass that defined fuction to it.
 
 Let's say we want to calculate age of a student in terms of months from a student object with age field in terms of years. Here is how we would do this by using **useobj** hook.
 
@@ -225,7 +225,7 @@ def age_in_months(obj):
 
 query = [
     "name",
-    
+
     # This is a custom field which is computed by using age field from a student object
     # Note how age_in_months function is passed to useobj hook(This is very important for API to work)
     {"age_in_months": dictfier.useobj(age_in_months)}
@@ -243,9 +243,9 @@ print(std_info)
 
 #### What if we want to use object field on a custom field(Rename obj field)?
 
-This can be accomplished in two ways, As you might have guessed, one way to do it is to use **useobj** hook by passing a function which return the value of a field which you want to use, another simple way is to use **usefield** hook. Just like **useobj** hook, **usefield** hook is used to hook or pull object field on a current query node. To use the current object field, just call **usefield** and pass a field name which you want to use or replace.
+This can be accomplished in two ways, As you might have guessed, one way to do it is to use **useobj** hook by passing a function which return the value of a field which you want to use, another simple way is to use **objfield** hook. Just like **useobj** hook, **objfield** hook is used to hook or pull object field on a current query node. To use the current object field, just call **objfield** and pass a field name which you want to use or replace.
 
-Let's say we want to rename **age** field to **age_in_years** in our results. Here is how we would do this by using **usefield** hook.
+Let's say we want to rename **age** field to **age_in_years** in our results. Here is how we would do this by using **objfield** hook.
 
 ```python
 import dictfier
@@ -259,7 +259,7 @@ student = Student("Danish", 24)
 
 query = [
     "name",
-    {"age_in_years": dictfier.usefield("age")}
+    {"age_in_years": dictfier.objfield("age")}
 ]
 
 std_info = dictfier.dictfy(student, query)
@@ -299,7 +299,7 @@ print(std_info)
 ```
 
 
-Infact **usefield** hook is implemented by using **useobj**, so both methods are the same interms of performance, but I think you would agree with me that in this case **usefield** is more readable than **useobj**.
+Infact **objfield** hook is implemented by using **useobj**, so both methods are the same interms of performance, but I think you would agree with me that in this case **objfield** is more readable than **useobj**.
 
 You can also query an object returned by **useobj** hook, This can be done by passing a query as a second argument to **useobj** or use 'query=your_query' as a kwarg. E.g.
 
@@ -324,7 +324,7 @@ query = [
     "age",
     {
         "course": dictfier.useobj(
-            lambda obj: obj.course, 
+            lambda obj: obj.course,
             ["name", "code"]  # This is a query
         )
     }
@@ -337,10 +337,10 @@ print(std_info)
 ```python
 # Output
 {
-    'name': 'Danish', 
-    'age': 24, 
+    'name': 'Danish',
+    'age': 24,
     'course': {
-        'name': 'Data Structures', 
+        'name': 'Data Structures',
         'code': 'CS201'
     }
 }
@@ -371,7 +371,7 @@ query = [
     "age",
     {
         "courses": dictfier.useobj(
-            lambda obj: obj.courses, 
+            lambda obj: obj.courses,
             [["name", "code"]]  # This is a query
         )
     }
@@ -384,10 +384,10 @@ print(std_info)
 ```python
 # Output
 {
-    'name': 'Danish', 
-    'age': 24, 
+    'name': 'Danish',
+    'age': 24,
     'courses': [
-        {'name': 'Data Structures', 'code': 'CS201'}, 
+        {'name': 'Data Structures', 'code': 'CS201'},
         {'name': 'Computer Networks', 'code': 'CS205'}
     ]
 }
@@ -412,7 +412,7 @@ query = [
 ]
 ```
 
-**dictfier** will convert it into 
+**dictfier** will convert it into
 
 ```python
 {
@@ -428,7 +428,7 @@ query = [
     "name",
     "age",
     {
-        "course": [ 
+        "course": [
             "code",
             "name",
         ]
@@ -456,7 +456,7 @@ query = [
     "name",
     "age",
     {
-        "course": [ 
+        "course": [
             [
                 "code",
                 "name",
@@ -467,7 +467,7 @@ query = [
 ```
 Putting a list or tuple inside a list or tuple of object fields is a way to declare that the Object is iterable. In this case
 ```python
-[ 
+[
     [
         "code",
         "name",
@@ -508,7 +508,7 @@ You might encounter a case where you have to change how dictfier works to get th
 In all cases above, function assigned to flat_obj, nested_flat_obj or nested_iter_obj accepts three positional arguments which are field value(object) and parent object and field name. Now consider an example of a simple ORM with two relations **Many** and **One** which are used to show how objects are related.
 
 ```python
-# Customize how dictfier obtains flat obj, 
+# Customize how dictfier obtains flat obj,
 # nested flat obj and nested iterable obj
 import dictfier
 
@@ -564,11 +564,11 @@ query = [
             "profession"
         ],
         "courses": [[
-            "name", 
+            "name",
             "code",
             {
                 "books": [[
-                    "title", 
+                    "title",
                     "publish_date"
                 ]]
             }
@@ -577,8 +577,8 @@ query = [
 ]
 
 result = dictfier.dictfy(
-    student, 
-    query, 
+    student,
+    query,
     flat_obj=lambda obj, parent: obj,
     nested_iter_obj=lambda obj, parent: obj.data,
     nested_flat_obj=lambda obj, parent: obj.data
@@ -589,21 +589,21 @@ print(result)
 ```python
 # Output
 {
-    'name': 'Danish', 
-    'age': 24, 
-    'mentor': {'name': 'Van Donald', 'profession': 'Software Eng'}, 
+    'name': 'Danish',
+    'age': 24,
+    'mentor': {'name': 'Van Donald', 'profession': 'Software Eng'},
     'courses': [
         {
-            'name': 'Data Structures', 
-            'code': 'CS201', 
+            'name': 'Data Structures',
+            'code': 'CS201',
             'books': [
-                {'title': 'Advanced Data Structures', 'publish_date': '2018'}, 
+                {'title': 'Advanced Data Structures', 'publish_date': '2018'},
                 {'title': 'Basic Data Structures', 'publish_date': '2010'}
             ]
-        }, 
+        },
         {
-            'name': 'Computer Networks', 
-            'code': 'CS220', 
+            'name': 'Computer Networks',
+            'code': 'CS220',
             'books': [
                 {'title': 'Computer Networks', 'publish_date': '2011'}
             ]
@@ -632,8 +632,8 @@ def get_pk(obj, parent, field_name):
         return obj
 
 result = dictfier.dictfy(
-    student, 
-    query, 
+    student,
+    query,
     flat_obj=get_pk,
     nested_iter_obj=lambda obj, parent: obj.data,
     nested_flat_obj=lambda obj, parent: obj.data
@@ -647,7 +647,6 @@ print(result)
 {'name': 'Danish', 'age': 24, 'mentor': 1, 'courses': [1, 2]}
 ```
 
-## Contributing [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
+## Contributing [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 I welcome all contributions. Please read [CONTRIBUTING.md](https://github.com/yezyilomo/dictfier/blob/master/CONTRIBUTING.md) first. You can submit any ideas as [pull requests](https://github.com/yezyilomo/dictfier/pulls) or as [GitHub issues](https://github.com/yezyilomo/dictfier/issues). If you'd like to improve code, check out the [Code Style Guide](https://github.com/yezyilomo/dictfier/blob/master/CONTRIBUTING.md#styleguides) and have a good time!.
-
